@@ -1,6 +1,7 @@
 function submitForm() {
     // Disable the submit button to prevent multiple submissions
     //submitButton.disabled = true;
+    //
 
     var name = document.getElementById("name").value;
     var email = document.getElementById("email").value;
