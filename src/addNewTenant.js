@@ -18,7 +18,7 @@ function submitForm() {
         alert("password too short");
         return;
     }
-
+//
     // Prepare the data to be sent in the request body
     var formData = {
         name: name,
