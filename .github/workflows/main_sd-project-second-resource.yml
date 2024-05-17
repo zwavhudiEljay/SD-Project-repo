@@ -62,4 +62,4 @@ jobs:
           slot-name: 'Production'
           publish-profile: ${{ secrets.AZUREAPPSERVICE_PUBLISHPROFILE_91CFCFB027C84B7A9C7DFF9B83E25810 }}
           package: .
-0 comments on commit 71b8de6
+
