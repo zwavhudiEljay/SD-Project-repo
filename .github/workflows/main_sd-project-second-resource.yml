@@ -68,4 +68,28 @@ jobs:
           app-name: 'SD-Project-second-resource'
           slot-name: 'Production'
           package: .
-          
+  
+
+
+  codecov:
+    runs-on: windows-latest
+    needs: build
+    steps:
+      - name: Set up Node.js
+        uses: actions/setup-node@v2
+        with:
+          node-version: '14'
+
+      - name: Install dependencies
+        run: npm install
+
+      - name: Run tests with coverage
+        run: npm test -- --coverage
+
+      - name: Upload coverage report to Codecov
+        uses: codecov/codecov-action@v2
+        with:
+          token: ${{ secrets.CODECOV_TOKEN }}
+
+
+
