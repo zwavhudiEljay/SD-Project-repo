@@ -1,4 +1,1 @@
-[![codecov](https://codecov.io/gh/zwavhudimunarini/SD-Project-repo/graph/badge.svg?token=UWTDONZHAB)](https://codecov.io/gh/zwavhudimunarini/SD-Project-repo)
-
-
-
+[![codecov](https://codecov.io/gh/zwavhudiEljay/SD-Project-repo/graph/badge.svg?token=32HR7T5N8G)](https://codecov.io/gh/zwavhudiEljay/SD-Project-repo)
