@@ -8,8 +8,8 @@ const path = require('path');
 const session = require('express-session');
 const multer=require("multer")
 const fs=require("fs")
-//const puppeteer = require('puppeteer');
-const { ChartJSNodeCanvas } = require('chartjs-node-canvas');
+const puppeteer = require('puppeteer');
+//const { ChartJSNodeCanvas } = require('chartjs-node-canvas');
 
 
 
@@ -939,163 +939,10 @@ app.get('/notification', async (req, res) => {
 
 
 
-// Chart.js setup
-const width = 800; // px
-const height = 400; // px
-const chartJSNodeCanvas = new ChartJSNodeCanvas({ width, height });
-
-function getMonthName(monthNumber) {
-    const months = [
-        "January", "February", "March", "April", "May", "June",
-        "July", "August", "September", "October", "November", "December"
-    ];
-    return months[monthNumber];
-}
-
-// Function to generate a full set of months
-function generateFullMonthSet() {
-    const fullMonthSet = [];
-    for (let i = 0; i < 12; i++) {
-        fullMonthSet.push({ month: getMonthName(i), num_fines: 0 });
-    }
-    return fullMonthSet;
-}
-
-//histogram
-app.get('/chart', async (req, res) => {
-    try {
-        const pool = await createConnectionPool();
-        const connection = await pool.getConnection();
-
-        // Retrieve fines data from the database
-        const [rows] = await connection.execute('SELECT month, COUNT(*) AS num_fines FROM fines GROUP BY month');
-        connection.release(); // Release the connection back to the pool
-
-        // Generate a full set of months
-        const fullMonthSet = generateFullMonthSet();
-
-        // Populate fines data for existing months
-        rows.forEach(({ month, num_fines }) => {
-            const index = fullMonthSet.findIndex(item => item.month.toLowerCase() === month.toLowerCase());
-            if (index !== -1) {
-                fullMonthSet[index].num_fines = num_fines;
-            }
-        });
-
-        // Sort months in order
-        fullMonthSet.sort((a, b) => {
-            return new Date('2000 ' + a.month) - new Date('2000 ' + b.month);
-        });
-
-        // Format data for Chart.js
-        const data = {
-            labels: fullMonthSet.map(item => item.month),
-            data: fullMonthSet.map(item => item.num_fines)
-        };
-
-        // Generate histogram chart using Chart.js
-        const configuration = {
-            type: 'bar',
-            data: {
-                labels: data.labels,
-                datasets: [{
-                    label: 'Number of Fines',
-                    data: data.data,
-                    backgroundColor: 'rgba(54, 162, 235, 0.5)',
-                    borderColor: 'rgba(54, 162, 235, 1)',
-                    borderWidth: 1
-                }]
-            },
-            options: {
-                scales: {
-                    y: {
-                        beginAtZero: true
-                    }
-                }
-            }
-        };
-
-        // Render the chart to a buffer
-        const image = await chartJSNodeCanvas.renderToBuffer(configuration);
-
-        // Set the content type to image/png and send the image
-        res.set('Content-Type', 'image/png');
-        res.send(image);
-    } catch (error) {
-        console.error('Error fetching fines data:', error);
-        res.status(500).json({ error: 'Internal server error' });
-    }
-});
-
-
-
-
-//line graph
-
-
-
-app.get('/line-chart', async (req, res) => {
-    try {
-        const pool = await createConnectionPool();
-        const connection = await pool.getConnection();
-
-        // Retrieve fines data from the database
-        const [rows] = await connection.execute('SELECT month, COUNT(*) AS num_fines FROM fines GROUP BY month');
-        connection.release(); // Release the connection back to the pool
-
-        // Generate a full set of months
-        const fullMonthSet = generateFullMonthSet();
-
-        // Populate fines data for existing months
-        rows.forEach(({ month, num_fines }) => {
-            const index = fullMonthSet.findIndex(item => item.month.toLowerCase() === month.toLowerCase());
-            if (index !== -1) {
-                fullMonthSet[index].num_fines = num_fines;
-            }
-        });
-
-        // Sort months in order
-        fullMonthSet.sort((a, b) => {
-            return new Date('2000 ' + a.month) - new Date('2000 ' + b.month);
-        });
-
-        // Format data for Chart.js
-        const data = {
-            labels: fullMonthSet.map(item => item.month),
-            datasets: [{
-                label: 'Number of Fines',
-                data: fullMonthSet.map(item => item.num_fines),
-                fill: false,
-                borderColor: 'rgba(54, 162, 235, 1)',
-                borderWidth: 1
-            }]
-        };
-
-        // Generate line chart using Chart.js
-        const configuration = {
-            type: 'line',
-            data: data,
-            options: {
-                scales: {
-                    y: {
-                        beginAtZero: true
-                    }
-                }
-            }
-        };
-
-        // Render the chart to a buffer
-        const image = await chartJSNodeCanvas.renderToBuffer(configuration);
-
-        // Set the content type to image/png and send the image
-        res.set('Content-Type', 'image/png');
-        res.send(image);
-    } catch (error) {
-        console.error('Error fetching fines data:', error);
-        res.status(500).json({ error: 'Internal server error' });
-    }
-});
-
+// // Chart.js setup
+// const width = 800; // px
+// const height = 400; // px
+// const chartJSNodeCanvas = new ChartJSNodeCanvas({ width, height });
 
 // function getMonthName(monthNumber) {
 //     const months = [
@@ -1105,6 +952,7 @@ app.get('/line-chart', async (req, res) => {
 //     return months[monthNumber];
 // }
 
+// // Function to generate a full set of months
 // function generateFullMonthSet() {
 //     const fullMonthSet = [];
 //     for (let i = 0; i < 12; i++) {
@@ -1113,53 +961,20 @@ app.get('/line-chart', async (req, res) => {
 //     return fullMonthSet;
 // }
 
-// async function generateChartHTML(type, data) {
-//     const chartHTML = `
-//         <html>
-//         <head>
-//             <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-//         </head>
-//         <body>
-//             <canvas id="myChart" width="800" height="400"></canvas>
-//             <script>
-//                 const ctx = document.getElementById('myChart').getContext('2d');
-//                 const myChart = new Chart(ctx, {
-//                     type: '${type}',
-//                     data: {
-//                         labels: ${JSON.stringify(data.labels)},
-//                         datasets: [{
-//                             label: 'Number of Fines',
-//                             data: ${JSON.stringify(data.data)},
-//                             ${type === 'bar' ? "backgroundColor: 'rgba(54, 162, 235, 0.5)', borderColor: 'rgba(54, 162, 235, 1)'," : "borderColor: 'rgba(54, 162, 235, 1)',"}
-//                             borderWidth: 1,
-//                             fill: ${type === 'line' ? 'false' : 'true'}
-//                         }]
-//                     },
-//                     options: {
-//                         scales: {
-//                             y: {
-//                                 beginAtZero: true
-//                             }
-//                         }
-//                     }
-//                 });
-//             </script>
-//         </body>
-//         </html>
-//     `;
-//     return chartHTML;
-// }
-
+// //histogram
 // app.get('/chart', async (req, res) => {
 //     try {
 //         const pool = await createConnectionPool();
 //         const connection = await pool.getConnection();
 
+//         // Retrieve fines data from the database
 //         const [rows] = await connection.execute('SELECT month, COUNT(*) AS num_fines FROM fines GROUP BY month');
-//         connection.release();
+//         connection.release(); // Release the connection back to the pool
 
+//         // Generate a full set of months
 //         const fullMonthSet = generateFullMonthSet();
 
+//         // Populate fines data for existing months
 //         rows.forEach(({ month, num_fines }) => {
 //             const index = fullMonthSet.findIndex(item => item.month.toLowerCase() === month.toLowerCase());
 //             if (index !== -1) {
@@ -1167,40 +982,71 @@ app.get('/line-chart', async (req, res) => {
 //             }
 //         });
 
-//         fullMonthSet.sort((a, b) => new Date('2000 ' + a.month) - new Date('2000 ' + b.month));
+//         // Sort months in order
+//         fullMonthSet.sort((a, b) => {
+//             return new Date('2000 ' + a.month) - new Date('2000 ' + b.month);
+//         });
 
+//         // Format data for Chart.js
 //         const data = {
 //             labels: fullMonthSet.map(item => item.month),
 //             data: fullMonthSet.map(item => item.num_fines)
 //         };
 
-//         const chartHTML = await generateChartHTML('bar', data);
+//         // Generate histogram chart using Chart.js
+//         const configuration = {
+//             type: 'bar',
+//             data: {
+//                 labels: data.labels,
+//                 datasets: [{
+//                     label: 'Number of Fines',
+//                     data: data.data,
+//                     backgroundColor: 'rgba(54, 162, 235, 0.5)',
+//                     borderColor: 'rgba(54, 162, 235, 1)',
+//                     borderWidth: 1
+//                 }]
+//             },
+//             options: {
+//                 scales: {
+//                     y: {
+//                         beginAtZero: true
+//                     }
+//                 }
+//             }
+//         };
 
-//         const browser = await puppeteer.launch();
-//         const page = await browser.newPage();
+//         // Render the chart to a buffer
+//         const image = await chartJSNodeCanvas.renderToBuffer(configuration);
 
-//         await page.setContent(chartHTML);
-//         const imageBuffer = await page.screenshot();
-//         await browser.close();
-
+//         // Set the content type to image/png and send the image
 //         res.set('Content-Type', 'image/png');
-//         res.send(imageBuffer);
+//         res.send(image);
 //     } catch (error) {
 //         console.error('Error fetching fines data:', error);
 //         res.status(500).json({ error: 'Internal server error' });
 //     }
 // });
+
+
+
+
+// //line graph
+
+
 
 // app.get('/line-chart', async (req, res) => {
 //     try {
 //         const pool = await createConnectionPool();
 //         const connection = await pool.getConnection();
 
+//         // Retrieve fines data from the database
 //         const [rows] = await connection.execute('SELECT month, COUNT(*) AS num_fines FROM fines GROUP BY month');
-//         connection.release();
+//         connection.release(); // Release the connection back to the pool
 
+//         // Generate a full set of months
 //         const fullMonthSet = generateFullMonthSet();
 
+//         // Populate fines data for existing months
 //         rows.forEach(({ month, num_fines }) => {
 //             const index = fullMonthSet.findIndex(item => item.month.toLowerCase() === month.toLowerCase());
 //             if (index !== -1) {
@@ -1208,33 +1054,187 @@ app.get('/line-chart', async (req, res) => {
 //             }
 //         });
 
-//         fullMonthSet.sort((a, b) => new Date('2000 ' + a.month) - new Date('2000 ' + b.month));
+//         // Sort months in order
+//         fullMonthSet.sort((a, b) => {
+//             return new Date('2000 ' + a.month) - new Date('2000 ' + b.month);
+//         });
 
+//         // Format data for Chart.js
 //         const data = {
 //             labels: fullMonthSet.map(item => item.month),
-//             data: fullMonthSet.map(item => item.num_fines)
+//             datasets: [{
+//                 label: 'Number of Fines',
+//                 data: fullMonthSet.map(item => item.num_fines),
+//                 fill: false,
+//                 borderColor: 'rgba(54, 162, 235, 1)',
+//                 borderWidth: 1
+//             }]
 //         };
 
-//         const chartHTML = await generateChartHTML('line', data);
+//         // Generate line chart using Chart.js
+//         const configuration = {
+//             type: 'line',
+//             data: data,
+//             options: {
+//                 scales: {
+//                     y: {
+//                         beginAtZero: true
+//                     }
+//                 }
+//             }
+//         };
 
-//         const browser = await puppeteer.launch();
-//         const page = await browser.newPage();
+//         // Render the chart to a buffer
+//         const image = await chartJSNodeCanvas.renderToBuffer(configuration);
 
-//         await page.setContent(chartHTML);
-//         const imageBuffer = await page.screenshot();
-//         await browser.close();
-
+//         // Set the content type to image/png and send the image
 //         res.set('Content-Type', 'image/png');
-//         res.send(imageBuffer);
+//         res.send(image);
 //     } catch (error) {
 //         console.error('Error fetching fines data:', error);
 //         res.status(500).json({ error: 'Internal server error' });
 //     }
 // });
 
-// app.get('/', (req, res) => {
-//     res.sendFile(path.join(__dirname, 'graphs.html'));
-// });
+
+function getMonthName(monthNumber) {
+    const months = [
+        "January", "February", "March", "April", "May", "June",
+        "July", "August", "September", "October", "November", "December"
+    ];
+    return months[monthNumber];
+}
+
+function generateFullMonthSet() {
+    const fullMonthSet = [];
+    for (let i = 0; i < 12; i++) {
+        fullMonthSet.push({ month: getMonthName(i), num_fines: 0 });
+    }
+    return fullMonthSet;
+}
+
+async function generateChartHTML(type, data) {
+    const chartHTML = `
+        <html>
+        <head>
+            <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+        </head>
+        <body>
+            <canvas id="myChart" width="800" height="400"></canvas>
+            <script>
+                const ctx = document.getElementById('myChart').getContext('2d');
+                const myChart = new Chart(ctx, {
+                    type: '${type}',
+                    data: {
+                        labels: ${JSON.stringify(data.labels)},
+                        datasets: [{
+                            label: 'Number of Fines',
+                            data: ${JSON.stringify(data.data)},
+                            ${type === 'bar' ? "backgroundColor: 'rgba(54, 162, 235, 0.5)', borderColor: 'rgba(54, 162, 235, 1)'," : "borderColor: 'rgba(54, 162, 235, 1)',"}
+                            borderWidth: 1,
+                            fill: ${type === 'line' ? 'false' : 'true'}
+                        }]
+                    },
+                    options: {
+                        scales: {
+                            y: {
+                                beginAtZero: true
+                            }
+                        }
+                    }
+                });
+            </script>
+        </body>
+        </html>
+    `;
+    return chartHTML;
+}
+
+app.get('/chart', async (req, res) => {
+    try {
+        const pool = await createConnectionPool();
+        const connection = await pool.getConnection();
+
+        const [rows] = await connection.execute('SELECT month, COUNT(*) AS num_fines FROM fines GROUP BY month');
+        connection.release();
+
+        const fullMonthSet = generateFullMonthSet();
+
+        rows.forEach(({ month, num_fines }) => {
+            const index = fullMonthSet.findIndex(item => item.month.toLowerCase() === month.toLowerCase());
+            if (index !== -1) {
+                fullMonthSet[index].num_fines = num_fines;
+            }
+        });
+
+        fullMonthSet.sort((a, b) => new Date('2000 ' + a.month) - new Date('2000 ' + b.month));
+
+        const data = {
+            labels: fullMonthSet.map(item => item.month),
+            data: fullMonthSet.map(item => item.num_fines)
+        };
+
+        const chartHTML = await generateChartHTML('bar', data);
+
+        const browser = await puppeteer.launch();
+        const page = await browser.newPage();
+
+        await page.setContent(chartHTML);
+        const imageBuffer = await page.screenshot();
+        await browser.close();
+
+        res.set('Content-Type', 'image/png');
+        res.send(imageBuffer);
+    } catch (error) {
+        console.error('Error fetching fines data:', error);
+        res.status(500).json({ error: 'Internal server error' });
+    }
+});
+
+app.get('/line-chart', async (req, res) => {
+    try {
+        const pool = await createConnectionPool();
+        const connection = await pool.getConnection();
+
+        const [rows] = await connection.execute('SELECT month, COUNT(*) AS num_fines FROM fines GROUP BY month');
+        connection.release();
+
+        const fullMonthSet = generateFullMonthSet();
+
+        rows.forEach(({ month, num_fines }) => {
+            const index = fullMonthSet.findIndex(item => item.month.toLowerCase() === month.toLowerCase());
+            if (index !== -1) {
+                fullMonthSet[index].num_fines = num_fines;
+            }
+        });
+
+        fullMonthSet.sort((a, b) => new Date('2000 ' + a.month) - new Date('2000 ' + b.month));
+
+        const data = {
+            labels: fullMonthSet.map(item => item.month),
+            data: fullMonthSet.map(item => item.num_fines)
+        };
+
+        const chartHTML = await generateChartHTML('line', data);
+
+        const browser = await puppeteer.launch();
+        const page = await browser.newPage();
+
+        await page.setContent(chartHTML);
+        const imageBuffer = await page.screenshot();
+        await browser.close();
+
+        res.set('Content-Type', 'image/png');
+        res.send(imageBuffer);
+    } catch (error) {
+        console.error('Error fetching fines data:', error);
+        res.status(500).json({ error: 'Internal server error' });
+    }
+});
+
+app.get('/', (req, res) => {
+    res.sendFile(path.join(__dirname, 'graphs.html'));
+});
 
 
 
