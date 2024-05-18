@@ -19,8 +19,16 @@ jobs:
         with:
           node-version: '18.x'
 
-      - name: Install Windows build tools
-        run: npm install --global --production windows-build-tools
+      - name: Install Chocolatey
+        run: |
+          Set-ExecutionPolicy Bypass -Scope Process -Force; `
+          [System.Net.ServicePointManager]::SecurityProtocol = [System.Net.ServicePointManager]::SecurityProtocol -bor 3072; `
+          iex ((New-Object System.Net.WebClient).DownloadString('https://chocolatey.org/install.ps1'))
+
+      - name: Install Python and Visual Studio Build Tools
+        run: |
+          choco install python2 --version=2.7.15 -y
+          choco install visualstudio2019buildtools --package-parameters "--add Microsoft.VisualStudio.Workload.VCTools --includeRecommended --includeOptional" -y
 
       - name: npm install, build, and test
         run: |
