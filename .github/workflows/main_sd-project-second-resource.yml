@@ -28,7 +28,7 @@ jobs:
       - name: Install Python and Visual Studio Build Tools
         run: |
           choco install python2 --version=2.7.15 -y
-          choco install visualstudio2019buildtools --package-parameters "--add Microsoft.VisualStudio.Workload.VCTools --includeRecommended --includeOptional" -y
+           
 
       - name: npm install, build, and test
         run: |
