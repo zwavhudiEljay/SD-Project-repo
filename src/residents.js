@@ -1,19 +1,22 @@
-// Function to report and save the issue
 function saveIssue() {
     const issue = document.getElementById('issue').value;
+    const month = document.getElementById('month').value; // Get the selected month
+
     fetch('/report-issue', {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json'
         },
-        body: JSON.stringify({ issue: issue })
+        body: JSON.stringify({ issue: issue, month: month }) // Include month in the request body
     })
     .then(response => {
         if (response.ok) {
-            const clearInput=document.getElementById('issue');
-            clearInput.value="";
-            closeModal();
-            
+            // Clear the input fields
+            document.getElementById('issue').value = "";
+            document.getElementById('month').value = "01"; // Reset to default month (January)
+
+            closeModal(); // Close the modal
+
             // Issue reported successfully, no need to update notifications widget here
         } else {
             console.error('Failed to report issue:', response.statusText);
@@ -23,7 +26,6 @@ function saveIssue() {
         console.error('Error reporting issue:', error);
     });
 }
-
 // Socket.IO Client-Side Code (Listening for Notifications)
 const socket = io();
 socket.on('new-issue', issue => {
