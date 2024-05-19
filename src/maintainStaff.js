@@ -110,4 +110,9 @@ function openFeedbackModal(issueId) {
     };
 }
 
-
+module.exports = {
+    fetchTotalIssues,
+    updateTotalIssues,
+    updateNotificationsWidget,
+    openFeedbackModal
+};

@@ -90,6 +90,33 @@
   text-decoration: none;
   cursor: pointer;
 }
+.enlarged-text-field {
+        width: 100%;
+        padding: 12px;
+        margin: 8px 0;
+        box-sizing: border-box;
+    }
+
+    .small-dropdown {
+        width: 50%; /* Set a smaller width for the dropdown */
+        padding: 12px;
+        margin: 8px 0;
+        box-sizing: border-box;
+    }
+    table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        th, td {
+            border: 1px solid #ddd;
+            padding: 8px;
+            text-align: left;
+        }
+
+        th {
+            background-color: #f2f2f2;
+        }
     </style>
         
     
@@ -105,11 +132,31 @@
     </div>
 
     <div id="feedbackModal" class="modal">
-        <div class="modal-content">
-          <span class="close">&times;</span>
-          <textarea id="feedbackTextArea" rows="4" cols="50"></textarea>
-          <button id="saveFeedbackButton">Save Feedback</button>
-        </div>
+      <div class="modal-content">
+          <span class="close" onclick="closeModal()">&times;</span>
+          <h2>Provide Feedback</h2>
+          
+          <label for="feedback">Feedback:</label>
+          <textarea id="feedbackTextArea" class="enlarged-text-field" rows="4" cols="50" placeholder="Enter your feedback..."></textarea>
+  
+          <label for="feedbackMonth">Month:</label>
+          <select id="feedbackMonth" class="small-dropdown">
+              <option value="01">January</option>
+              <option value="02">February</option>
+              <option value="03">March</option>
+              <option value="04">April</option>
+              <option value="05">May</option>
+              <option value="06">June</option>
+              <option value="07">July</option>
+              <option value="08">August</option>
+              <option value="09">September</option>
+              <option value="10">October</option>
+              <option value="11">November</option>
+              <option value="12">December</option>
+          </select>
+  
+          <button id="saveFeedbackButton" onclick="saveFeedback()">Save Feedback</button>
       </div>
+  </div>
 </body>
 </html>

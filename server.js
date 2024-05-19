@@ -272,31 +272,30 @@ app.post('/login', async (request, response) => {
 
 // Handle Issue Reporting Endpoint
 app.post('/report-issue', async (request, response) => {
-  const { issue } = request.body;
-  console.log("the request body: ",request.body);
-
-  try {
-      const pool = await createConnectionPool(); // Assuming you have a function to create a connection pool
-      const connection = await pool.getConnection();
-
-      // Insert the new issue into the database
-      await connection.execute(
-          'INSERT INTO issue_reports (issue) VALUES (?)',
-          [issue]
-      );
-
-      connection.release();
-
-      // Emit a new-issue event to notify staff members
-      
-
-      response.status(201).json({ message: 'Issue reported successfully' });
-  } catch (error) {
-      console.error('Error reporting issue:', error);
-      response.status(500).json({ error: 'Internal server error' });
-  }
-});
-
+    const { issue, month } = request.body; // Destructure issue and month from the request body
+    console.log("The request body: ", request.body);
+  
+    try {
+        const pool = await createConnectionPool(); // Assuming you have a function to create a connection pool
+        const connection = await pool.getConnection();
+  
+        // Insert the new issue into the database
+        await connection.execute(
+            'INSERT INTO issue_reports (issue, month) VALUES (?, ?)', // Include month in the SQL statement
+            [issue, month]
+        );
+  
+        connection.release();
+  
+        // Emit a new-issue event to notify staff members
+        // Implement your event emission logic here if needed
+  
+        response.status(201).json({ message: 'Issue reported successfully' });
+    } catch (error) {
+        console.error('Error reporting issue:', error);
+        response.status(500).json({ error: 'Internal server error' });
+    }
+  });
 
   
 // Handle GET request to fetch reported issues
@@ -427,15 +426,15 @@ app.post('/assign-to-maintanace', async (req, res) => {
 // add feedback to the issues that might be complete Denzel
 
 app.post('/update-feedback/:id', async (req, res) => {
-    const { feedback } = req.body;
+    const { feedback, month } = req.body; // Destructure feedback and month from the request body
     const issueId = req.params.id;
 
     try {
         const pool = await createConnectionPool();
         const connection = await pool.getConnection();
 
-        const sql = 'UPDATE MaintenanceIssues SET feedback = ? WHERE id = ?';
-        await connection.execute(sql, [feedback, issueId]);
+        const sql = 'UPDATE MaintenanceIssues SET feedback = ?, month = ? WHERE id = ?'; // Update SQL query to include month
+        await connection.execute(sql, [feedback, month, issueId]); // Pass feedback, month, and issueId as parameters
 
         connection.release();
         console.log('Feedback given successfully');
