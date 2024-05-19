@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<coverage generated="1716142491558" clover="3.2.0">
-  <project timestamp="1716142491558" name="All files">
+<coverage generated="1716142730321" clover="3.2.0">
+  <project timestamp="1716142730321" name="All files">
     <metrics statements="247" coveredstatements="169" conditionals="58" coveredconditionals="26" methods="48" coveredmethods="28" elements="353" coveredelements="223" complexity="0" loc="247" ncloc="247" packages="1" files="5" classes="5"/>
     <file name="addNewTenant.js" path="C:\Users\Khodani\SD-Project-repo-1\src\addNewTenant.js">
       <metrics statements="28" coveredstatements="18" conditionals="10" coveredconditionals="6" methods="6" coveredmethods="3"/>
