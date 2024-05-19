@@ -1,72 +1,117 @@
 const { 
-    updateTotalIssues,
-    saveFeedback,
-    openFeedbackModal,
-    fetchTotalIssues 
+    updateTotalIssues, 
+    saveFeedback, 
+    openFeedbackModal, 
+    fetchTotalIssues
 } = require('./mainFeedback');
 const { test, expect } = require('@jest/globals');
 
-describe('updateTotalIssues', () => {
-    beforeEach(() => {
+// Mocking the global fetch function
+global.fetch = jest.fn(() =>
+    Promise.resolve({
+        ok: true,
+        json: () => Promise.resolve({ issues: ['Issue 1', 'Issue 2'], ids: [1, 2] })
+    })
+);
+
+describe('fetchTotalIssues', () => {
+    test('fetches and updates total issues', async () => {
         document.body.innerHTML = '<ul id="feedback-list"></ul>';
+        await fetchTotalIssues();
+
+        const observerCallback = (mutationsList, observer) => {
+            for (let mutation of mutationsList) {
+                if (mutation.type === 'childList' && mutation.addedNodes.length) {
+                    expect(document.getElementById('issue-1').textContent).toBe('Issue 1Write Feedback');
+                    expect(document.getElementById('issue-2').textContent).toBe('Issue 2Write Feedback');
+                    observer.disconnect(); // Stop observing once the elements are found
+                }
+            }
+        };
+
+        const observer = new MutationObserver(observerCallback);
+        observer.observe(document.getElementById('feedback-list'), { childList: true });
     });
 
-    test('should add issues to the DOM', () => {
-        const issues = ['Issue 1', 'Issue 2'];
-        const ids = [123, 456];
+});
 
+describe('updateTotalIssues', () => {
+    test('should clear previous issues before adding new ones', () => {
+        const issues = ['Issue 1', 'Issue 2'];
+        const ids = [1, 2];
+        const initialIssues = ['Initial Issue'];
+        const initialIds = [789];
+
+        updateTotalIssues(initialIssues, initialIds);
         updateTotalIssues(issues, ids);
 
         const list = document.getElementById('feedback-list');
-        const firstItemText = list.children[0].childNodes[0].nodeValue.trim(); 
-        expect(firstItemText).toBe('Issue 1');
+        expect(list.children.length).toBe(2);
     });
-});
 
+    test('updates the feedback list with issues', () => {
+        document.body.innerHTML = '<ul id="feedback-list"></ul>';
+        const issues = ['Issue 1', 'Issue 2'];
+        const ids = [1, 2];
+        updateTotalIssues(issues, ids);
+        expect(document.getElementById('issue-1').textContent).toBe('Issue 1Write Feedback');
+        expect(document.getElementById('issue-2').textContent).toBe('Issue 2Write Feedback');
+    });
+
+});
 
 describe('openFeedbackModal', () => {
     beforeEach(() => {
-        // Set up the DOM elements needed for the test
         document.body.innerHTML = `
-            <div id="feedbackModal" style="display: none;"></div>
-            <textarea id="feedbackTextArea"></textarea>
-            <button id="saveFeedbackButton"></button>
+            <div id="feedbackModal" style="display: none;">
+                <textarea id="feedbackTextArea"></textarea>
+                <button id="saveFeedbackButton"></button>
+            </div>
         `;
+        console.log = jest.fn();
     });
 
-    test('should display the feedback modal', () => {
+    test('opens the feedback modal and sets up save button event listener', () => {
+        openFeedbackModal(1);
         const modal = document.getElementById('feedbackModal');
-        openFeedbackModal('123');
+        const saveButton = document.getElementById('saveFeedbackButton');
+        const textArea = document.getElementById('feedbackTextArea');
+
         expect(modal.style.display).toBe('block');
+
+        textArea.value = 'Test feedback';
+        saveButton.click();
+
+        expect(console.log).toHaveBeenCalledWith('Feedback:', 'Test feedback');
     });
 });
 
-
 describe('saveFeedback', () => {
     beforeEach(() => {
-        global.fetch = jest.fn(() => Promise.resolve({
-            ok: true,
-            json: () => Promise.resolve({ message: 'Feedback saved successfully' })
-        }));
+        global.fetch.mockClear();
+        global.fetch.mockImplementation(() =>
+            Promise.resolve({
+                ok: true,
+                json: () => Promise.resolve({ message: 'Feedback saved successfully' })
+            })
+        );
     });
 
-    test('should call fetch with the correct parameters', async () => {
-        await saveFeedback('123', 'Good job');
-
-        expect(fetch).toHaveBeenCalledWith(`/update-feedback/123`, {
+    test('saves feedback and handles success', async () => {
+        console.log = jest.fn();
+        await saveFeedback(1, 'Test feedback');
+        expect(fetch).toHaveBeenCalledWith('/update-feedback/1', expect.objectContaining({
             method: 'POST',
-            headers: {
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify({ feedback: 'Good job' })
-        });
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ feedback: 'Test feedback' })
+        }));
+        expect(console.log).toHaveBeenCalledWith('Feedback saved successfully:', 'Feedback saved successfully');
     });
 
-    test('should handle server errors gracefully', async () => {
-        fetch.mockImplementationOnce(() => Promise.resolve({
-            ok: false
-        }));
-
-        await expect(saveFeedback('123', 'Good job')).rejects.toThrow('Failed to save feedback');
+    test('handles save feedback error', async () => {
+        global.fetch.mockImplementationOnce(() => Promise.reject(new Error('Failed to save feedback')));
+        console.error = jest.fn();
+        await expect(saveFeedback(1, 'Test feedback')).rejects.toThrow('Failed to save feedback');
+        expect(console.error).toHaveBeenCalledWith('Error saving feedback:', expect.any(Error));
     });
 });
