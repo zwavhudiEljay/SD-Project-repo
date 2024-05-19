@@ -6,6 +6,34 @@ const {
 } = require('./maintainStaff');
 const { test, expect } = require('@jest/globals');
 
+global.fetch = jest.fn(() =>
+    Promise.resolve({
+        ok: true,
+        json: () => Promise.resolve({ issues: ['Issue 1', 'Issue 2'], ids: [1, 2] })
+    })
+);
+
+describe('fetchTotalIssues', () => {
+    test('fetches and updates total issues', async () => {
+        document.body.innerHTML = '<ul id="maintain-list"></ul>';
+        await fetchTotalIssues();
+
+        const observerCallback = (mutationsList, observer) => {
+            for (let mutation of mutationsList) {
+                if (mutation.type === 'childList' && mutation.addedNodes.length) {
+                    expect(document.getElementById('issue-1').textContent).toBe('Issue 1');
+                    expect(document.getElementById('issue-2').textContent).toBe('Issue 2');
+                    observer.disconnect(); // Stop observing once the elements are found
+                }
+            }
+        };
+
+        const observer = new MutationObserver(observerCallback);
+        observer.observe(document.getElementById('maintain-list'), { childList: true });
+    });
+});
+
+
 describe('updateTotalIssues', () => {
     test('should create list items for each issue', () => {
         document.body.innerHTML = `<div id="maintain-list"></div>`;
