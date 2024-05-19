@@ -425,42 +425,42 @@ async function searchStaff() {
 }
 
 
-// // Function to delete a staff member
-// async function deleteStaff(staffId, listItemID) {
-//     if (confirm('Are you sure you want to delete this staff member?')) {
-//         try {
-//             // Send an AJAX request to the server to delete the staff member
-//             const response = await fetch(`/staff/${staffId}`, {
-//                 method: 'DELETE'
-//             });
+// Function to delete a staff member
+async function deleteStaff(staffId, listItemID) {
+    if (confirm('Are you sure you want to delete this staff member?')) {
+        try {
+            // Send an AJAX request to the server to delete the staff member
+            const response = await fetch(`/staff/${staffId}`, {
+                method: 'DELETE'
+            });
 
-//             if (response.ok) {
-//                 // Staff member successfully deleted
-//                 console.log('Staff member deleted successfully');
-//                 searchStaff();
-//                 // Remove the deleted staff member from the search results
-//                 const searchResult = document.getElementById(listItemID);
-//                 if (searchResult) {
-//                     searchResult.remove();
-//                 }
-//                 displayStaffList();
-//                 // Check if there are no more search results, clear input and hide results
-//                 const searchResults = document.getElementById('searchResults');
-//                 if (searchResults.children.length === 0) {
-//                     document.getElementById('searchInput').value = '';
-//                     searchResults.style.display = 'none';
-//                 }
-//             } else {
-//                 // Error occurred while deleting staff member
-//                 console.error('Error deleting staff member:', response.status);
-//                 // Optionally, show an error message to the user
-//             }
-//         } catch (error) {
-//             console.error('Error deleting staff member:', error);
-//             // Optionally, show an error message to the user
-//         }
-//     }
-//}
+            if (response.ok) {
+                // Staff member successfully deleted
+                console.log('Staff member deleted successfully');
+                searchStaff();
+                // Remove the deleted staff member from the search results
+                const searchResult = document.getElementById(listItemID);
+                if (searchResult) {
+                    searchResult.remove();
+                }
+                displayStaffList();
+                // Check if there are no more search results, clear input and hide results
+                const searchResults = document.getElementById('searchResults');
+                if (searchResults.children.length === 0) {
+                    document.getElementById('searchInput').value = '';
+                    searchResults.style.display = 'none';
+                }
+            } else {
+                // Error occurred while deleting staff member
+                console.error('Error deleting staff member:', response.status);
+                // Optionally, show an error message to the user
+            }
+        } catch (error) {
+            console.error('Error deleting staff member:', error);
+            // Optionally, show an error message to the user
+        }
+    }
+}
 
 
 //add staff
