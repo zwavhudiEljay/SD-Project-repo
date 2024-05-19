@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+<!-- <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
@@ -45,6 +45,118 @@
             })
             .catch(error => {
                 console.error('Error fetching line graph image:', error);
+            });
+    </script>
+</body>
+</html> -->
+
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Graphs</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+    <h1>Fines Histogram</h1>
+    <canvas id="chartCanvas" width="400" height="200"></canvas>
+    <br>
+    <h1>Fines Line Graph</h1>
+    <canvas id="lineChartCanvas" width="400" height="200"></canvas>
+
+    <script>
+        async function fetchFinesData() {
+            const response = await fetch('/fines-data');
+            if (!response.ok) {
+                throw new Error('Failed to fetch fines data');
+            }
+            return response.json();
+        }
+
+        function drawChart(data) {
+            const ctx = document.getElementById('chartCanvas').getContext('2d');
+            new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: data.map(item => item.month),
+                    datasets: [{
+                        label: 'Total Fines',
+                        data: data.map(item => item.num_fines),
+                        backgroundColor: 'rgba(255, 206, 86, 0.5)',
+                        borderColor: 'rgba(255, 206, 86, 1)',
+                        borderWidth: 1
+                    }, {
+                        label: 'Paid Fines',
+                        data: data.map(item => item.num_paid_fines),
+                        backgroundColor: 'rgba(54, 162, 235, 0.5)',
+                        borderColor: 'rgba(54, 162, 235, 1)',
+                        borderWidth: 1
+                    }, {
+                        label: 'Unpaid Fines',
+                        data: data.map(item => item.num_unpaid_fines),
+                        backgroundColor: 'rgba(255, 99, 132, 0.5)',
+                        borderColor: 'rgba(255, 99, 132, 1)',
+                        borderWidth: 1
+                    }]
+                },
+                options: {
+                    scales: {
+                        y: {
+                            beginAtZero: true
+                        }
+                    }
+                }
+            });
+        }
+
+        function drawLineChart(data) {
+            const ctx = document.getElementById('lineChartCanvas').getContext('2d');
+            new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: data.map(item => item.month),
+                    datasets: [{
+                        label: 'Total Fines',
+                        data: data.map(item => item.num_fines),
+                        backgroundColor: 'rgba(255, 206, 86, 0.5)',
+                        borderColor: 'rgba(255, 206, 86, 1)',
+                        fill: false,
+                        tension: 0.1
+                    }, {
+                        label: 'Paid Fines',
+                        data: data.map(item => item.num_paid_fines),
+                        backgroundColor: 'rgba(54, 162, 235, 0.5)',
+                        borderColor: 'rgba(54, 162, 235, 1)',
+                        fill: false,
+                        tension: 0.1
+                    }, {
+                        label: 'Unpaid Fines',
+                        data: data.map(item => item.num_unpaid_fines),
+                        backgroundColor: 'rgba(255, 99, 132, 0.5)',
+                        borderColor: 'rgba(255, 99, 132, 1)',
+                        fill: false,
+                        tension: 0.1
+                    }]
+                },
+                options: {
+                    scales: {
+                        y: {
+                            beginAtZero: true
+                        }
+                    }
+                }
+            });
+        }
+
+        fetchFinesData()
+            .then(data => {
+                drawChart(data);
+                drawLineChart(data);
+            })
+            .catch(error => {
+                console.error('Error fetching fines data:', error);
             });
     </script>
 </body>

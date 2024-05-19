@@ -12,8 +12,6 @@
             display: flexbox;
             justify-content: center;
             align-items: center;
-            
-           
             max-width: 400px;
             margin: 0 auto;
             padding: 40px;
@@ -81,9 +79,12 @@
                 <input type="text" id="action" name="action" required>
             </div>
             <div class="form-group">
-                <label for="month">Month:</label>
-                <input type="text" id="month" name="month" required>
+                <label for="Month">Month:</label>
+                <select id="Month" name="Month" required>
+                    <option value="">Select Month</option>
+                </select>
             </div>
+            
             <div class="form-group">
                 <input type="submit" value="Issue Fine">
             </div>
@@ -91,6 +92,30 @@
     </div>
     
     <script>
+
+        // Function to populate the select element with months
+        function populateMonths() {
+            const select = document.getElementById("Month");
+            const months = [
+                "January", "February", "March", "April", "May", "June",
+                "July", "August", "September", "October", "November", "December"
+            ];
+
+            months.forEach(month => {
+                const option = document.createElement("option");
+                option.value = month; // Use month name as value
+                option.text = month;
+                select.appendChild(option);
+            });
+        }
+
+        // Call the function to populate the select element
+        populateMonths();
+
+
+
+
+
         //get all tenants so that they can appear as options on the dropdown menu
         fetch('/recipients')
             .then(response => response.json())
@@ -113,7 +138,7 @@
             var description = document.getElementById("description").value;
             var amount = document.getElementById("amount").value;
             var action = document.getElementById("action").value;
-            var month = document.getElementById("month").value;
+            var month = document.getElementById("Month").value;
             
             const recipientSelect = document.getElementById('recipient');
             const selectedRecipientId = recipientSelect.value;

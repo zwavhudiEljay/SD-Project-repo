@@ -6,12 +6,18 @@ const bcrypt = require('bcryptjs');
 const mysql = require('mysql2/promise');
 const path = require('path');
 const session = require('express-session');
-const multer=require("multer")
-const fs=require("fs")
+const multer=require("multer");
+const fs=require("fs");
+//const Chart = require('chart.js');
+
+//const Highcharts = require('highcharts');
+
+//const d3 = await import('d3');
+//const d3 = require('d3');
 //const puppeteer = require('puppeteer');
 //const { ChartJSNodeCanvas } = require('chartjs-node-canvas');
 
-const QuickChart = require('quickchart-js');
+//const QuickChart = require('quickchart-js');
 
 //const bodyParser = require('body-parser');
 //const { emit } = require('process');
@@ -1096,139 +1102,230 @@ app.get('/notification', async (req, res) => {
 //     }
 // });
 // Function to generate a full set of months
+
+
+
+//using quickchart
+// function generateFullMonthSet() {
+//     const months = [
+//         "January", "February", "March", "April", "May", "June",
+//         "July", "August", "September", "October", "November", "December"
+//     ];
+//     const fullMonthSet = months.map(month => ({ month, num_fines: 0 }));
+//     return fullMonthSet;
+// }
+// app.get('/chart', async (req, res) => {
+//     try {
+//         const pool = await createConnectionPool();
+//         const connection = await pool.getConnection();
+
+//         // Retrieve fines data from the database
+//         const [rows] = await connection.execute(`
+//             SELECT 
+//                 month, 
+//                 COUNT(*) AS num_fines,
+//                 SUM(CASE WHEN paidAmount = 0 THEN 1 ELSE 0 END) AS num_unpaid_fines,
+//                 SUM(CASE WHEN paidAmount != 0 THEN 1 ELSE 0 END) AS num_paid_fines
+//             FROM fines 
+//             GROUP BY month
+//         `);
+//         connection.release(); // Release the connection back to the pool
+
+//         // Generate a full set of months
+//         const fullMonthSet = generateFullMonthSet();
+
+//         // Populate fines data for existing months
+//         rows.forEach(({ month, num_fines, num_unpaid_fines, num_paid_fines }) => {
+//             const index = fullMonthSet.findIndex(item => item.month.toLowerCase() === month.toLowerCase());
+//             if (index !== -1) {
+//                 fullMonthSet[index].num_fines = num_fines;
+//                 fullMonthSet[index].num_unpaid_fines = num_unpaid_fines;
+//                 fullMonthSet[index].num_paid_fines = num_paid_fines;
+//             }
+//         });
+
+//         // Sort months in order
+//         fullMonthSet.sort((a, b) => {
+//             return new Date('2000 ' + a.month) - new Date('2000 ' + b.month);
+//         });
+
+//         // Create QuickChart instance
+//         const chart = new QuickChart();
+//         chart.setConfig({
+//             type: 'bar',
+//             data: {
+//                 labels: fullMonthSet.map(item => item.month),
+//                 datasets: [{
+//                     label: 'Total Fines',
+//                     data: fullMonthSet.map(item => item.num_fines),
+//                     backgroundColor: 'rgba(255, 206, 86, 0.5)', // Yellow
+//                     borderColor: 'rgba(255, 206, 86, 1)',
+//                     borderWidth: 1
+//                 }, {
+//                     label: 'Paid Fines',
+//                     data: fullMonthSet.map(item => item.num_paid_fines),
+//                     backgroundColor: 'rgba(54, 162, 235, 0.5)', // Blue
+//                     borderColor: 'rgba(54, 162, 235, 1)',
+//                     borderWidth: 1
+//                 }, {
+//                     label: 'Unpaid Fines',
+//                     data: fullMonthSet.map(item => item.num_unpaid_fines),
+//                     backgroundColor: 'rgba(255, 99, 132, 0.5)', // Red
+//                     borderColor: 'rgba(255, 99, 132, 1)',
+//                     borderWidth: 1
+//                 }]
+//             },
+//             options: {
+//                 scales: {
+//                     y: {
+//                         beginAtZero: true
+//                     }
+//                 }
+//             }
+//         });
+//         chart.setWidth(400).setHeight(250).setBackgroundColor('white');
+
+//         // Get the image URL
+//         const chartUrl = chart.getUrl();
+
+//         // Send the image URL as a response
+//         res.redirect(chartUrl);
+//     } catch (error) {
+//         console.error('Error fetching fines data:', error);
+//         res.status(500).json({ error: 'Internal server error' });
+//     }
+// });
+
+
+// app.get('/line-chart', async (req, res) => {
+//     try {
+//         const pool = await createConnectionPool();
+//         const connection = await pool.getConnection();
+
+//         // Retrieve fines data from the database
+//         const [rows] = await connection.execute(`
+//             SELECT 
+//                 month, 
+//                 COUNT(*) AS num_fines,
+//                 SUM(CASE WHEN paidAmount = 0 THEN 1 ELSE 0 END) AS num_unpaid_fines,
+//                 SUM(CASE WHEN paidAmount != 0 THEN 1 ELSE 0 END) AS num_paid_fines
+//             FROM fines 
+//             GROUP BY month
+//         `);
+//         connection.release(); // Release the connection back to the pool
+
+//         // Generate a full set of months
+//         const fullMonthSet = generateFullMonthSet();
+
+//         // Populate fines data for existing months
+//         rows.forEach(({ month, num_fines, num_unpaid_fines, num_paid_fines }) => {
+//             const index = fullMonthSet.findIndex(item => item.month.toLowerCase() === month.toLowerCase());
+//             if (index !== -1) {
+//                 fullMonthSet[index].num_fines = num_fines;
+//                 fullMonthSet[index].num_unpaid_fines = num_unpaid_fines;
+//                 fullMonthSet[index].num_paid_fines = num_paid_fines;
+//             }
+//         });
+
+//         // Sort months in order
+//         fullMonthSet.sort((a, b) => {
+//             return new Date('2000 ' + a.month) - new Date('2000 ' + b.month);
+//         });
+
+//         // Create QuickChart instance for line chart
+//         const chart = new QuickChart();
+//         chart.setConfig({
+//             type: 'line',
+//             data: {
+//                 labels: fullMonthSet.map(item => item.month),
+//                 datasets: [{
+//                     label: 'Total Fines',
+//                     data: fullMonthSet.map(item => item.num_fines),
+//                     fill: false,
+//                     borderColor: 'rgba(54, 162, 235, 1)',
+//                     borderWidth: 1
+//                 }, {
+//                     label: 'Unpaid Fines',
+//                     data: fullMonthSet.map(item => item.num_unpaid_fines),
+//                     fill: false,
+//                     borderColor: 'rgba(255, 99, 132, 1)',
+//                     borderWidth: 1
+//                 }, {
+//                     label: 'Paid Fines',
+//                     data: fullMonthSet.map(item => item.num_paid_fines),
+//                     fill: false,
+//                     borderColor: 'rgba(75, 192, 192, 1)',
+//                     borderWidth: 1
+//                 }]
+//             },
+//             options: {
+//                 scales: {
+//                     y: {
+//                         beginAtZero: true
+//                     }
+//                 }
+//             }
+//         });
+//         chart.setWidth(400).setHeight(250).setBackgroundColor('white');
+
+//         // Get the image URL
+//         const chartUrl = chart.getUrl();
+
+//         // Send the image URL as a response
+//         res.redirect(chartUrl);
+//     } catch (error) {
+//         console.error('Error fetching fines data:', error);
+//         res.status(500).json({ error: 'Internal server error' });
+//     }
+// });
+
+
+
 function generateFullMonthSet() {
     const months = [
         "January", "February", "March", "April", "May", "June",
         "July", "August", "September", "October", "November", "December"
     ];
-    const fullMonthSet = months.map(month => ({ month, num_fines: 0 }));
-    return fullMonthSet;
+    return months.map(month => ({ month, num_fines: 0, num_unpaid_fines: 0, num_paid_fines: 0 }));
 }
 
-
-app.get('/chart', async (req, res) => {
+app.get('/fines-data', async (req, res) => {
     try {
         const pool = await createConnectionPool();
         const connection = await pool.getConnection();
 
-        // Retrieve fines data from the database
-        const [rows] = await connection.execute('SELECT month, COUNT(*) AS num_fines FROM fines GROUP BY month');
-        connection.release(); // Release the connection back to the pool
+        const [rows] = await connection.execute(`
+            SELECT 
+                month, 
+                COUNT(*) AS num_fines,
+                SUM(CASE WHEN paidAmount = 0 THEN 1 ELSE 0 END) AS num_unpaid_fines,
+                SUM(CASE WHEN paidAmount != 0 THEN 1 ELSE 0 END) AS num_paid_fines
+            FROM fines 
+            GROUP BY month
+        `);
+        connection.release();
 
-        // Generate a full set of months
         const fullMonthSet = generateFullMonthSet();
 
-        // Populate fines data for existing months
-        rows.forEach(({ month, num_fines }) => {
+        rows.forEach(({ month, num_fines, num_unpaid_fines, num_paid_fines }) => {
             const index = fullMonthSet.findIndex(item => item.month.toLowerCase() === month.toLowerCase());
             if (index !== -1) {
                 fullMonthSet[index].num_fines = num_fines;
+                fullMonthSet[index].num_unpaid_fines = num_unpaid_fines;
+                fullMonthSet[index].num_paid_fines = num_paid_fines;
             }
         });
 
-        // Sort months in order
         fullMonthSet.sort((a, b) => {
             return new Date('2000 ' + a.month) - new Date('2000 ' + b.month);
         });
 
-        // Create QuickChart instance
-        const chart = new QuickChart();
-        chart.setConfig({
-            type: 'bar',
-            data: {
-                labels: fullMonthSet.map(item => item.month),
-                datasets: [{
-                    label: 'Number of Fines',
-                    data: fullMonthSet.map(item => item.num_fines),
-                    backgroundColor: 'rgba(54, 162, 235, 0.5)',
-                    borderColor: 'rgba(54, 162, 235, 1)',
-                    borderWidth: 1
-                }]
-            },
-            options: {
-                scales: {
-                    y: {
-                        beginAtZero: true
-                    }
-                }
-            }
-        });
-        chart.setWidth(400).setHeight(250).setBackgroundColor('white');
-
-        // Get the image URL
-        const chartUrl = chart.getUrl();
-
-        // Send the image URL as a response
-        res.redirect(chartUrl);
+        res.json(fullMonthSet);
     } catch (error) {
         console.error('Error fetching fines data:', error);
         res.status(500).json({ error: 'Internal server error' });
     }
 });
-
-
-app.get('/line-chart', async (req, res) => {
-    try {
-        const pool = await createConnectionPool();
-        const connection = await pool.getConnection();
-
-        // Retrieve fines data from the database
-        const [rows] = await connection.execute('SELECT month, COUNT(*) AS num_fines FROM fines GROUP BY month');
-        connection.release(); // Release the connection back to the pool
-
-        // Generate a full set of months
-        const fullMonthSet = generateFullMonthSet();
-
-        // Populate fines data for existing months
-        rows.forEach(({ month, num_fines }) => {
-            const index = fullMonthSet.findIndex(item => item.month.toLowerCase() === month.toLowerCase());
-            if (index !== -1) {
-                fullMonthSet[index].num_fines = num_fines;
-            }
-        });
-
-        // Sort months in order
-        fullMonthSet.sort((a, b) => {
-            return new Date('2000 ' + a.month) - new Date('2000 ' + b.month);
-        });
-
-        // Create QuickChart instance for line chart
-        const chart = new QuickChart();
-        chart.setConfig({
-            type: 'line',
-            data: {
-                labels: fullMonthSet.map(item => item.month),
-                datasets: [{
-                    label: 'Number of Fines',
-                    data: fullMonthSet.map(item => item.num_fines),
-                    fill: false,
-                    borderColor: 'rgba(54, 162, 235, 1)',
-                    borderWidth: 1
-                }]
-            },
-            options: {
-                scales: {
-                    y: {
-                        beginAtZero: true
-                    }
-                }
-            }
-        });
-        chart.setWidth(400).setHeight(250).setBackgroundColor('white');
-
-        // Get the image URL
-        const chartUrl = chart.getUrl();
-
-        // Send the image URL as a response
-        res.redirect(chartUrl);
-    } catch (error) {
-        console.error('Error fetching fines data:', error);
-        res.status(500).json({ error: 'Internal server error' });
-    }
-});
-
-
-
 
 server.listen(port, () => {
     console.log(`Server started at http://localhost:${port}`);

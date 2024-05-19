@@ -339,6 +339,72 @@
         border-radius: 20px;
         background-color: rgba(255, 255, 255, 0.319)
     }
+
+    
+    .notification-icon {
+        position: absolute;
+        top: 20px;
+        right: 20px;
+        width: 40px;
+        height: 40px;
+        cursor: pointer;
+        margin-top: 40px;
+        margin-right: 80px;
+    }
+
+    .notification-icon img {
+        width: 100%;
+        height: 100%;
+    }
+    .dropdown-content {
+        display: none;
+        position: absolute;
+        right: 0;
+        background-color: #5d5d63;
+        min-width: 200px;
+        max-height: 300px;
+        overflow-y: auto;
+        border-radius: 10px;
+        box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
+        z-index: 1;
+    }
+
+    
+
+    .dropdown-content p {
+        color: white;
+        padding: 12px 16px;
+        text-decoration: none;
+        display: block;
+        cursor: pointer;
+        width: 200px; /* Adjust this width as needed */
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+
+    .dropdown-content p:hover {
+        background-color: #f1f1f1;
+    }
+
+    .notification {
+        padding: 10px;
+        margin: 10px 0;
+        background-color: rgb(118, 118, 128);
+        border: 1px solid #030303;
+        
+        
+        border-radius: 5px;
+        box-shadow: 0 0 5px rgba(0, 0, 0, 0.1);
+        overflow: hidden;
+        white-space: nowrap;
+        text-overflow: ellipsis;
+    }
+
+    .notification:hover {
+        background-color: #e9ecef;
+    }
+
 </style>
 
 <body>
@@ -420,12 +486,93 @@
     </script>
 
     <section class="widget-container">
+
+        <div class="notification-icon">
+            <img src="images/notification.jpeg" alt="Notifications" id="notificationIcon">
+            <div id="notificationDropdown" class="dropdown-content">
+                <!-- Add your notifications here -->
+                <p>No new notifications</p>
+            </div>
+        </div>
+        
+
+        <script>
+            document.getElementById('notificationIcon').addEventListener('click', function() {
+                var dropdown = document.getElementById('notificationDropdown');
+                if (dropdown.style.display === 'none' || dropdown.style.display === '') {
+                    dropdown.style.display = 'block';
+                } else {
+                    dropdown.style.display = 'none';
+                }
+            });
+
+            // Close the dropdown if the user clicks outside of it
+            window.onclick = function(event) {
+                if (!event.target.matches('#notificationIcon')) {
+                    var dropdowns = document.getElementsByClassName("dropdown-content");
+                    for (var i = 0; i < dropdowns.length; i++) {
+                        var openDropdown = dropdowns[i];
+                        if (openDropdown.style.display === 'block') {
+                            openDropdown.style.display = 'none';
+                        }
+                    }
+                }
+            };
+
+            // Function to handle clicking on a notification text
+            function handleNotificationClick(notification) {
+                // Redirect to another page with notification details
+                window.location.href = 'notification-details.html?id=' + notification.id;
+            }
+
+            // Function to fetch notifications from the server
+            async function fetchNotifications() {
+                try {
+                    const response = await fetch('/notifications');
+                    if (!response.ok) {
+                        throw new Error('Failed to fetch notifications');
+                    }
+                    const notifications = await response.json();
+
+                    // Update the HTML content with the notifications
+                    const notificationsDropdown = document.getElementById('notificationDropdown');
+                    notificationsDropdown.innerHTML = ''; // Clear previous content
+                    if (notifications.length === 0) {
+                        notificationsDropdown.innerHTML = '<p>No new notifications</p>';
+                    } else {
+                        notifications.forEach(notification => {
+                            const listItem = document.createElement('p');
+                            listItem.classList.add('notification');
+                            const messageElement = document.createElement('span');
+                            messageElement.textContent = notification.message;
+                            listItem.appendChild(messageElement);
+                            listItem.addEventListener('click', () => handleNotificationClick(notification));
+                            notificationsDropdown.appendChild(listItem);
+                        });
+                    }
+                } catch (error) {
+                    console.error('Error fetching notifications:', error);
+                }
+            }
+
+            // Fetch notifications when the page loads
+            document.addEventListener('DOMContentLoaded', fetchNotifications);
+        </script>
+
+
+
         <a ><button id="addNewStaff" onclick="openNav()" style="margin-left: 10px;" >Add new Staff</button></a>
        
         <a href="staffWidget.html" class="widget" onclick="handleWidgetClick('staff')">
             <h3>Staff</h3>
             <img class="icon" src="images/staff.png">
             <p id="staff">57</p>
+        </a>
+
+        <a href="sendNotifications.html" class="widget" onclick="handleWidgetClick('notifications')">
+            <h3>Send Notification</h3>
+            <img class="icon" src="images/notification.jpeg">
+            <p>17</p>
         </a>
         
         <a href="#" class="widget" onclick="handleWidgetClick('ongoing-issues')">
@@ -438,11 +585,7 @@
             <img class="icon" src="images/fines.webp">
             <p id="fines">8</p>
         </a>
-        <a href="#" class="widget" onclick="handleWidgetClick('notifications')">
-            <h3>Notifications</h3>
-            <img class="icon" src="images/notification.jpeg">
-            <p id="notifications">3</p>
-        </a>
+        
 
         
     </section>
