@@ -115,4 +115,4 @@ function updateNotificationsWidget(finesData) {
     notificationsList.appendChild(table);
 }
 
-
+module.exports = {fetchFines,updateNotificationsWidget};
