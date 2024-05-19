@@ -21,27 +21,6 @@ describe('submitForm', () => {
         window.alert = jest.fn();
     });
 
-    test('should show alert when passwords do not match', () => {
-        // Mock window.alert
-        window.alert = jest.fn();
-
-        // Mock getElementById to return different values for password and confirmPassword fields
-        document.getElementById = jest.fn((id) => {
-            switch (id) {
-                case 'name': return { value: 'John Doe' };
-                case 'email': return { value: 'john@example.com' };
-                case 'password': return { value: 'password1' };
-                case 'confirmPassword': return { value: 'password2' }; // Deliberate mismatch
-                default: return null;
-            }
-        });
-        // Call the function being tested
-        submitForm();
-
-        // Expect an alert to be shown for passwords not matching
-        expect(window.alert).toHaveBeenCalledWith('Passwords do not match');
-    });
-
     test('should show alert when password is too short', () => {
         // Mock DOM elements with a password less than 8 characters
         document.getElementById = jest.fn((id) => ({ value: '1234567' })); // Mock getElementById
@@ -112,15 +91,25 @@ describe('submitForm', () => {
         expect(window.alert).toHaveBeenCalledWith('Passwords do not match');
     });
 
-    test('password length validation', () => {
-        // Mock DOM elements with a password less than 8 characters
-        document.getElementById = jest.fn((id) => ({ value: '1234567' })); // Mock getElementById
+        test('should re-enable submit button after failed submission', async () => {
+        fetchMock.mockImplementationOnce(() =>
+            Promise.resolve({
+                ok: false,
+                json: () => Promise.resolve({ message: 'Error occurred' }),
+            })
+        );
 
-        // Call submitForm function
-        submitForm();
+        await submitForm();
 
-        // Expect alert to be called with appropriate message
-        expect(window.alert).toHaveBeenCalledWith('password too short');
+        expect(document.getElementById('addNewTenant').disabled).toBe(false);
+    });
+
+    test('should re-enable submit button after network error', async () => {
+        fetchMock.mockImplementationOnce(() => Promise.reject(new Error('Network error')));
+
+        await submitForm();
+
+        expect(document.getElementById('addNewTenant').disabled).toBe(false);
     });
 });
 
