@@ -439,7 +439,7 @@ app.get('/total-issues', async (req, res) => {
         const connection = await pool.getConnection();
   
         // Retrieve all reported issues from the database
-        const [rows] = await connection.execute('SELECT id,issueAssigned FROM MaintenanceIssues');
+        const [rows] = await connection.execute('SELECT id,issueAssigned FROM MaintenanceIssues where feedback is null');
         
         // Extract ids and issues from the rows
         const ids = rows.map(row => row.id);
@@ -977,6 +977,71 @@ app.get('/fines-data', async (req, res) => {
     }
 });
 
+function generateFullMonthSet2() {
+    const months = [
+        "January", "February", "March", "April", "May", "June",
+        "July", "August", "September", "October", "November", "December"
+    ];
+    return months.map(month => ({ month, num_issues: 0, num_open_issues: 0, num_closed_issues: 0 }));
+}
+
+app.get('/issues-table-data', async (req, res) => {
+    try {
+        const pool = await createConnectionPool();
+        const connection = await pool.getConnection();
+
+        // Fetch monthly issue counts
+        const [issueRows] = await connection.execute(`
+            SELECT 
+                month, 
+                COUNT(issue) AS num_issues
+            FROM 
+                issue_reports
+            GROUP BY 
+                month;
+        `);
+
+        // Fetch closed issue counts
+        const [closedIssueRows] = await connection.execute(`
+            SELECT 
+                month,
+                COUNT(*) AS num_closed_issues
+            FROM 
+                maintenanceissues
+            WHERE 
+                feedback IS NOT NULL
+            GROUP BY 
+                month;
+        `);
+
+        connection.release();
+
+        // Combine the results into a single array
+        const fullMonthSet = generateFullMonthSet2();
+
+        issueRows.forEach(({ month, num_issues }) => {
+            if (month && month >= 1 && month <= 12) {
+                const index = month - 1; // Adjusting for 0-based index
+                fullMonthSet[index].num_issues = num_issues;
+            }
+        });
+
+        closedIssueRows.forEach(({ month, num_closed_issues }) => {
+            if (month && month >= 1 && month <= 12) {
+                const index = month - 1; // Adjusting for 0-based index
+                const num_issues = fullMonthSet[index].num_issues;
+                const num_open_issues = num_issues - num_closed_issues;
+                fullMonthSet[index].num_open_issues = num_open_issues;
+                fullMonthSet[index].num_closed_issues = num_closed_issues;
+            }
+        });
+
+        res.json(fullMonthSet);
+    } catch (error) {
+        console.error('Error fetching issues data:', error);
+        res.status(500).json({ error: 'Internal server error' });
+    }
+});
 server.listen(port, () => {
     console.log(`Server started at http://localhost:${port}`);
 });

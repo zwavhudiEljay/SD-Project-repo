@@ -5,6 +5,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Graphs</title>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.9.2/html2pdf.bundle.min.js"></script>
     <style>
         /* Flexbox to arrange canvas elements side by side */
         .divs {
@@ -41,6 +43,7 @@
     </style>
 </head>
 <body>
+    
     <h1>FINES</h1>
     <br>
     <div class="divs">
@@ -57,6 +60,26 @@
             <canvas id="pieChartCanvas"></canvas>
         </div>
     </div>
+
+
+    <h1>Issues</h1>
+    <br>
+    <div class="divs">
+        <div class="chart-container">
+            <h2>Issues histograph</h2>
+            <canvas id="IssuesCanvas"></canvas>
+        </div>
+        <div class="chart-container">
+            <h2>Issues Line Graph</h2>
+            <canvas id="IssueslineChartCanvas"></canvas>
+        </div>
+        <div class="chart-containerr">
+            <h2>Total Issues Per Month</h2>
+            <canvas id="IssuespieChartCanvas"></canvas>
+        </div>
+    </div>
+<!-- HTML Button -->
+<button id="downloadPdfButton">Download as PDF</button>
 
     <script>
         async function fetchFinesData() {
@@ -186,6 +209,152 @@
             .catch(error => {
                 console.error('Error fetching fines data:', error);
             });
+
+
+
+    //denzels code
+    async function fetchIssuesData() {
+            const response = await fetch('/issues-table-data');
+            if (!response.ok) {
+                throw new Error('Failed to fetch issues data');
+            }
+            return response.json();
+        }
+
+        function drawIssuesChart(data) {
+            const ctx = document.getElementById('IssuesCanvas').getContext('2d');
+            new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: data.map(item => item.month),
+                    datasets: [{
+                        label: 'Total Issues',
+                        data: data.map(item => item.num_issues),
+                        backgroundColor: 'rgba(255, 206, 86, 0.5)',
+                        borderColor: 'rgba(255, 206, 86, 1)',
+                        borderWidth: 1
+                    }, {
+                        label: 'Issues still open',
+                        data: data.map(item => item.num_open_issues),
+                        backgroundColor: 'rgba(54, 162, 235, 0.5)',
+                        borderColor: 'rgba(54, 162, 235, 1)',
+                        borderWidth: 1
+                    }, {
+                        label: 'Closed Issues',
+                        data: data.map(item => item.num_closed_issues),
+                        backgroundColor: 'rgba(255, 99, 132, 0.5)',
+                        borderColor: 'rgba(255, 99, 132, 1)',
+                        borderWidth: 1
+                    }]
+                },
+                options: {
+                    scales: {
+                        y: {
+                            beginAtZero: true
+                        }
+                    }
+                }
+            });
+        }
+        function drawIssuesLineChart(data) {
+            const ctx = document.getElementById('IssueslineChartCanvas').getContext('2d');
+            new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: data.map(item => item.month),
+                    datasets: [{
+                        label: 'Total Fines',
+                        data: data.map(item => item.num_issues),
+                        backgroundColor: 'rgba(255, 206, 86, 0.5)',
+                        borderColor: 'rgba(255, 206, 86, 1)',
+                        fill: false,
+                        tension: 0.1
+                    }, {
+                        label: 'Issues Still open',
+                        data: data.map(item => item.num_open_issues),
+                        backgroundColor: 'rgba(54, 162, 235, 0.5)',
+                        borderColor: 'rgba(54, 162, 235, 1)',
+                        fill: false,
+                        tension: 0.1
+                    }, {
+                        label: 'Closed Issues',
+                        data: data.map(item => item.num_closed_issues),
+                        backgroundColor: 'rgba(255, 99, 132, 0.5)',
+                        borderColor: 'rgba(255, 99, 132, 1)',
+                        fill: false,
+                        tension: 0.1
+                    }]
+                },
+                options: {
+                    scales: {
+                        y: {
+                            beginAtZero: true
+                        }
+                    }
+                }
+            });
+        }
+        function drawIssuesPieChart(data) {
+            const ctx = document.getElementById('IssuespieChartCanvas').getContext('2d');
+            new Chart(ctx, {
+                type: 'pie',
+                data: {
+                    labels: data.map(item => item.month),
+                    datasets: [{
+                        label: 'Total Issues',
+                        data: data.map(item => item.num_issues),
+                        backgroundColor: [
+                            'blue',
+                            '#e04141',
+                            'pink',
+                            'green',
+                            'yellow',
+                            'orange',
+                            'purple',
+                            '#6cc17d',
+                            'grey',
+                            '#535a61',
+                            '#ca74b2',
+                            '#48a2d9'
+                        ],
+                        
+                        borderWidth: 1
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false
+                }
+            });
+        }
+
+
+        fetchIssuesData()
+            .then(data => {
+                drawIssuesChart(data);
+                drawIssuesLineChart(data);
+                drawIssuesPieChart(data);
+            })
+            .catch(error => {
+                console.error('Error fetching fines data:', error);
+            });
+
+
+
+            function downloadPdf() {
+        const element = document.body; // Select the entire body content
+        html2pdf()
+            .from(element)
+            .set({ format: 'a4', orientation: 'landscape' }) // Set landscape orientation
+            .save('document.pdf');
+        }
+
+        // Attach event listener to the download button
+        document.getElementById('downloadPdfButton').addEventListener('click', downloadPdf);
+
+
+            
+
     </script>
 </body>
 </html>
