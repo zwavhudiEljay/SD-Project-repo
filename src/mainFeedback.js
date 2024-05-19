@@ -104,5 +104,13 @@ async function saveFeedback(issueId, feedback) {
     } catch (error) {
         console.error('Error saving feedback:', error);
         // Handle error cases if necessary
+        throw error;
     }
+}
+
+module.exports = {
+    updateTotalIssues,
+    saveFeedback,
+    openFeedbackModal,
+    fetchTotalIssues
 }
