@@ -1,40 +1,31 @@
-
-
-//get all tenants in the database, so that u can delete them
-
-function fetchUsers() {
-    fetch('/get-users')
-    .then(response => {
+async function fetchUsers() {
+    try {
+        const response = await fetch('/get-users');
         if (response.ok) {
-            return response.json();
+            const data = await response.json();
+            updateNotificationsWidget(data.names, data.emails, data.ids);
         } else {
             throw new Error('Failed to fetch reported issues');
         }
-    })
-    .then(data => {
-        console.log(data);
-        const { names,emails,ids } = data;
-        
-        
-        updateNotificationsWidget(names,emails,ids);
-    })
-    .catch(error => {
+    } catch (error) {
         console.error('Error fetching reported issues:', error);
-    });
+    }
 }
 
 
 function updateNotificationsWidget(names, emails, ids) {
     const notificationsList = document.getElementById('notifications-list');
-
     // Clear existing items in the list
     notificationsList.innerHTML = '';
 
     // Add each issue to the notifications widget
     names.forEach((name, index) => {
         const newItem = document.createElement('li');
+        
         newItem.className = 'notification-item'; // Add a class for styling
         newItem.id = `issue-${ids[index]}`; // Set ID for identifying the issue
+
+        
 
         // Construct the content of the list item with icons using innerHTML
         newItem.innerHTML = `
@@ -54,7 +45,7 @@ function updateNotificationsWidget(names, emails, ids) {
         deleteButton.onclick = function() {
             // Extract the issue ID from the ID of the parent list item
             const Id = newItem.id.split('-')[1];
-            console.log(Id);
+            console.log("person to be deleted has id: ",Id);
             
             // Call a function to delete the item from the database
             deleteIssue(Id);
@@ -68,34 +59,16 @@ function updateNotificationsWidget(names, emails, ids) {
     });
 }
 
-
-
-
-
-
-// Initialize Socket.IO Client-Side Code
-// const socket = io();
-
-// // Update total issues count when received from the server
-// socket.on('total-issues-count', (totalCount) => {
-//     const totalIssuesCountElement = document.getElementById('total-issues-count');
-//     totalIssuesCountElement.textContent = totalCount;
-// });
-
-
-
-//delete the Tenant
 function deleteIssue(Id) {
-    // Send a DELETE request to the server to delete the issue
-    fetch(`/delete-user/${Id}`, {
+    return fetch(`/delete-user/${Id}`, {
         method: 'DELETE'
     })
     .then(response => {
         if (response.ok) {
-            // If deletion is successful, remove the corresponding item from the UI
-            const itemToRemove = document.getElementById(`issue-${Id}`);
-            itemToRemove.parentNode.removeChild(itemToRemove);
-            console.log(`Issue with ID ${Id} deleted successfully.`);
+            const element = document.getElementById(`issue-${Id}`);
+            if (element) {
+                element.parentNode.removeChild(element);
+            }
         } else {
             throw new Error('Failed to delete issue');
         }
@@ -105,5 +78,5 @@ function deleteIssue(Id) {
     });
 }
 
-//module.exports={ fetchUsers };
-module.exports = { deleteIssue };
+
+module.exports = { fetchUsers, deleteIssue };
