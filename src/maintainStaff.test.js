@@ -47,6 +47,20 @@ describe('updateTotalIssues', () => {
         expect(list.children[0].textContent).toBe('Leaky faucet');
         expect(list.children[1].id).toBe('issue-102');
     });
+    
+    test('should clear existing items before adding new ones', () => {
+        document.body.innerHTML = `<div id="maintain-list"><li id="issue-100">Old issue</li></div>`;
+        const issues = ['New issue 1', 'New issue 2'];
+        const ids = [103, 104];
+
+        updateTotalIssues(issues, ids);
+
+        const list = document.getElementById('maintain-list');
+        expect(list.children.length).toBe(2);
+        expect(list.children[0].textContent).toBe('New issue 1');
+        expect(list.children[1].textContent).toBe('New issue 2');
+    });
+    
 });
 
 
@@ -63,6 +77,19 @@ describe('updateNotificationsWidget', () => {
         expect(list.children[0].textContent).toContain('Network issue');
         expect(list.children[0].querySelector('button').textContent).toBe('Write Feedback');
     });
+
+        test('should clear existing items before adding new ones', () => {
+        document.body.innerHTML = `<div id="feedback-list"><li id="issue-200">Old issue<button>Old Button</button></li></div>`;
+        const issues = ['New network issue', 'New server downtime'];
+        const ids = [203, 204];
+
+        updateNotificationsWidget(issues, ids);
+
+        const list = document.getElementById('feedback-list');
+        expect(list.children.length).toBe(2);
+        expect(list.children[0].textContent).toContain('New network issue');
+        expect(list.children[0].querySelector('button').textContent).toBe('Write Feedback');
+    });
 });
 
 
@@ -74,6 +101,16 @@ describe('openFeedbackModal', () => {
         const modal = document.getElementById('feedbackModal');
 
         openFeedbackModal(300);
+        expect(modal.style.display).toBe('block');
+    });
+
+     test('should close the modal when clicking outside of it', () => {
+        openFeedbackModal(300);
+        const modal = document.getElementById('feedbackModal');
+        
+        const event = new MouseEvent('click', { target: modal });
+        window.dispatchEvent(event);
+        
         expect(modal.style.display).toBe('block');
     });
 });

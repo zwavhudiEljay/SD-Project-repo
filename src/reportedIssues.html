@@ -1,102 +1,3 @@
-<!--
-
-
-    <!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <script src="reportedIssues.js"></script>
-    <title>Document</title>
-    <style>
-        /* Add your CSS styling here */
-        .notification-item {
-            display: flex; /* Use flexbox for layout */
-            align-items: center; /* Vertically center the content */
-            margin-bottom: 10px;
-            background-color: #565960;
-            border-radius: 20px;
-            font-size: x-large;
-            border: none;
-            padding-left: 10px;
-            color: rgb(254, 254, 254);
-            width: 70%;
-            height: 4vh;
-            position: relative; /* Make the container relative for absolute positioning of buttons */
-        }
-
-        .assign-button{
-
-            position: absolute; /* Position buttons absolutely */
-            top: 50%; /* Align buttons vertically */
-            z-index: 1;
-                
-            background-color: #007bff; /* Blue */
-            color: #fff;
-            border: none;
-            border-radius: 5px;
-            padding: 5px 10px;
-            cursor: pointer;
-            transform: translateY(-50%); /* Adjust for vertical alignment */
-            width: auto; /* Allow buttons to adjust width based on content */
-
-        }
-        .delete-button {
-            position: absolute; /* Position buttons absolutely */
-            top: 50%; /* Align buttons vertically */
-            z-index: 1;
-                
-            background-color: rgb(199, 66, 66); /* Blue */
-            color: #fff;
-            border: none;
-            border-radius: 5px;
-            padding: 5px 10px;
-            cursor: pointer;
-            transform: translateY(-50%); /* Adjust for vertical alignment */
-            width: auto; /* Allow buttons to adjust width based on content */
-        }
-
-        .assign-button {
-            right: -150px; /* Position the assign button to the left of the container */
-        }
-
-        .delete-button {
-            right: -210px; /* Position the delete button to the right of the container */
-        }
-
-        .assign-button:hover {
-            background-color: #0056b3; /* Darker Blue */
-        }
-        .delete-button:hover {
-            background-color: #e60000; /* Darker Red */
-        }
-        #notifications-list {
-            list-style-type: none; /* Remove bullets */
-            padding: 0; /* Remove default padding */
-            margin: 0; /* Remove default margin */
-            
-        }
-        
-    </style>
-</head>
-<body>
-
-   
-    <div id="notifications">
-        <h3>Notifications <button onclick="fetchReportedIssues()"> Refresh</button></h3>
-        <ul id="notifications-list">
-            
-         
-        </ul>
-    </div>
-
-    
-
-</body>
-</html>
-
--->
-
 
 <!DOCTYPE html>
 <html lang="en">
@@ -106,10 +7,12 @@
     <script src="reportedIssues.js"></script>
     <title>Document</title>
     <style>
-        /* Add your CSS styling here */
+       
+        
         table {
             width: 100%;
             border-collapse: collapse;
+            color: #e04141;
         }
 
         th, td {
@@ -175,3 +78,4 @@
 
 </body>
 </html>
+

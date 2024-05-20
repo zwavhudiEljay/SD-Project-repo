@@ -48,7 +48,7 @@ function  updateTotalIssues(issues, ids) {
             openFeedbackModal(issueId);
         };
 
-        // Append the button to the list item
+        // Append the button to the list items
         newItem.appendChild(writeFeedbackButton);
 
         // Append the list item to the notifications list

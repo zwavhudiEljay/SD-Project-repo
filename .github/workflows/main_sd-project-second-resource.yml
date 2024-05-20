@@ -61,13 +61,13 @@ jobs:
   #         tenant-id: ${{ secrets.AZUREAPPSERVICE_TENANTID_9C2FEA17DF1641EDB3ED4EEB8695F6B3 }}
   #         subscription-id: ${{ secrets.AZUREAPPSERVICE_SUBSCRIPTIONID_E3F75B0DC5E5439B8679DBAE67D2362B }}
 
-  #     - name: 'Deploy to Azure Web App'
-  #       uses: azure/webapps-deploy@v2
-  #       id: deploy-to-webapp
-  #       with:
-  #         app-name: 'SD-Project-second-resource'
-  #         slot-name: 'Production'
-  #         package: . 
+      - name: 'Deploy to Azure Web App'
+        uses: azure/webapps-deploy@v2
+        id: deploy-to-webapp
+        with:
+          app-name: 'SD-Project-second-resource'
+          slot-name: 'Production'
+          package: .
   
 
 
