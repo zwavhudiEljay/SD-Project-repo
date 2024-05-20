@@ -67,15 +67,15 @@
     <br>
     <div class="divs">
         <div class="chart-container">
-            <h2>Fines Histogram</h2>
+            <h2>Histogram showing Total Number of Fines, Paid Fines and Unpaid Fines Per Month</h2>
             <canvas id="chartCanvas"></canvas>
         </div>
         <div class="chart-container">
-            <h2>Fines Line Graph</h2>
+            <h2>Fines Line Graph showing Total Number of Fines, Paid Fines and Unpaid Fines Per Month</h2>
             <canvas id="lineChartCanvas"></canvas>
         </div>
         <div class="chart-containerr">
-            <h2>Total Fines Per Month</h2>
+            <h2>Pie Chart showing Total Number of Fines, Paid Fines and Unpaid Fines Per Month</h2>
             <canvas id="pieChartCanvas"></canvas>
         </div>
     </div>
@@ -84,15 +84,15 @@
     <br>
     <div class="divs">
         <div class="chart-container">
-            <h2>Issues Histogram</h2>
+            <h2>Histogram showing Total number of Issues, Open Issues and Closed Issues Per Month</h2>
             <canvas id="IssuesCanvas"></canvas>
         </div>
         <div class="chart-container">
-            <h2>Issues Line Graph</h2>
+            <h2>Line Graph showing Total number of Issues, Open Issues and Closed Issues Per Month</h2>
             <canvas id="IssueslineChartCanvas"></canvas>
         </div>
         <div class="chart-containerr">
-            <h2>Total Issues Per Month</h2>
+            <h2>Pie Chart showing Total number of Issues, Open Issues and Closed Issues Per Month</h2>
             <canvas id="IssuespieChartCanvas"></canvas>
         </div>
     </div>
@@ -135,7 +135,20 @@
                 options: {
                     scales: {
                         y: {
-                            beginAtZero: true
+
+                            beginAtZero: true,
+                            title:{
+                                display:true,
+                                text:"Number of Fine"
+                            }
+                        },
+                        x: {
+
+                            beginAtZero: true,
+                            title:{
+                                display:true,
+                                text:"Months"
+                            }
                         }
                     }
                 }
@@ -174,7 +187,20 @@
                 options: {
                     scales: {
                         y: {
-                            beginAtZero: true
+
+                            beginAtZero: true,
+                            title:{
+                                display:true,
+                                text:"Number of Fine"
+                            }
+                        },
+                        x: {
+
+                            beginAtZero: true,
+                            title:{
+                                display:true,
+                                text:"Months"
+                            }
                         }
                     }
                 }
@@ -196,13 +222,8 @@
                             'pink',
                             'green',
                             'yellow',
-                            'orange',
-                            'purple',
-                            '#6cc17d',
-                            'grey',
-                            '#535a61',
-                            '#ca74b2',
-                            '#48a2d9'
+                            'orange'
+                            
                         ],
                         borderWidth: 1
                     }]
@@ -261,7 +282,20 @@
                 options: {
                     scales: {
                         y: {
-                            beginAtZero: true
+
+                            beginAtZero: true,
+                            title:{
+                                display:true,
+                                text:"Number of Fine"
+                            }
+                        },
+                        x: {
+
+                            beginAtZero: true,
+                            title:{
+                                display:true,
+                                text:"Months"
+                            }
                         }
                     }
                 }
@@ -300,7 +334,20 @@
                 options: {
                     scales: {
                         y: {
-                            beginAtZero: true
+
+                            beginAtZero: true,
+                            title:{
+                                display:true,
+                                text:"Number of Fine"
+                            }
+                        },
+                        x: {
+
+                            beginAtZero: true,
+                            title:{
+                                display:true,
+                                text:"Months"
+                            }
                         }
                     }
                 }
@@ -322,13 +369,8 @@
                             'pink',
                             'green',
                             'yellow',
-                            'orange',
-                            'purple',
-                            '#6cc17d',
-                            'grey',
-                            '#535a61',
-                            '#ca74b2',
-                            '#48a2d9'
+                            'orange'
+                            
                         ],
                         borderWidth: 1
                     }]

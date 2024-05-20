@@ -933,8 +933,7 @@ app.get('/notification', async (req, res) => {
 //get data related to fines. i.e all fines, paid and unpaid fines
 function generateFullMonthSet() {
     const months = [
-        "January", "February", "March", "April", "May", "June",
-        "July", "August", "September", "October", "November", "December"
+        "January", "February", "March", "April", "May", "June"
     ];
     return months.map(month => ({ month, num_fines: 0, num_unpaid_fines: 0, num_paid_fines: 0 }));
 }
@@ -977,10 +976,10 @@ app.get('/fines-data', async (req, res) => {
     }
 });
 
+//denzel
 function generateFullMonthSet2() {
     const months = [
-        "January", "February", "March", "April", "May", "June",
-        "July", "August", "September", "October", "November", "December"
+        "January", "February", "March", "April", "May", "June"
     ];
     return months.map(month => ({ month, num_issues: 0, num_open_issues: 0, num_closed_issues: 0 }));
 }
@@ -1020,14 +1019,14 @@ app.get('/issues-table-data', async (req, res) => {
         const fullMonthSet = generateFullMonthSet2();
 
         issueRows.forEach(({ month, num_issues }) => {
-            if (month && month >= 1 && month <= 12) {
+            if (month && month >= 1 && month <= 6) {
                 const index = month - 1; // Adjusting for 0-based index
                 fullMonthSet[index].num_issues = num_issues;
             }
         });
 
         closedIssueRows.forEach(({ month, num_closed_issues }) => {
-            if (month && month >= 1 && month <= 12) {
+            if (month && month >= 1 && month <= 6) {
                 const index = month - 1; // Adjusting for 0-based index
                 const num_issues = fullMonthSet[index].num_issues;
                 const num_open_issues = num_issues - num_closed_issues;
