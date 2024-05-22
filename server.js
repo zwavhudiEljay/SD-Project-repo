@@ -6,6 +6,7 @@ const bcrypt = require('bcryptjs');
 const mysql = require('mysql2/promise');
 const path = require('path');
 const session = require('express-session');
+//const MySQLStore = require('express-mysql-session')(session);
 const multer=require("multer");
 const fs=require("fs");
 
@@ -21,10 +22,15 @@ app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
 //app.use(bodyParser.json());
 
+// Set up session store with MySQL
+
+
 app.use(session({
+    
     secret: 'Vhanarini064', // Secret key for session encryption (replace with your own secret)
     resave: false,
-    saveUninitialized: false
+    saveUninitialized: true
+    
 }));
 
 const upload = multer({ dest: 'uploads/' });
@@ -46,22 +52,6 @@ io.on('connection', socket => {
     });
 });
 
-// const createConnectionPool = async () => {
-//     try {
-//         const pool = await mysql.createPool({
-//             host: 'localhost',
-//             user: 'zwavhudi',
-//             password: 'Vhanarini064',
-//             database: 'sdproject'
-//         });
-//         console.log('MySQL connection pool created successfully');
-//         return pool;
-//     } catch (error) {
-//         console.error('Error creating MySQL connection pool: ', error);
-//         throw error;
-//     }
-// };
-
 
 
 const config = {
@@ -72,9 +62,7 @@ const config = {
     ssl: {
 
         rejectUnauthorized: false
-        // Enable SSL if required by your MySQL server
-        // For Azure, SSL is usually required
-        //ca:path.join(__dirname,'C:\Users\Khodani\OneDrive\Documents\SD-Project-repo-1')
+       
     }
 };
 
@@ -214,6 +202,11 @@ app.post('/login', async (request, response) => {
         if (staffRows.length > 0) {
             user = staffRows[0];
             role = 'maintanance'; // Assuming the role is stored in the Staff table
+        
+            //store ID of maintanance
+            const selectedMaintananceID = staffRows[0].id; // get id of selected maintenance
+                request.session.selectedMaintananceID = selectedMaintananceID; // store it in the session
+                console.log('Maintenance ID:', selectedMaintananceID);
         }
     }
 
@@ -385,20 +378,45 @@ const getTotalIssuesCount = async () => {
       throw error;
   }
 };
-app.post('/assign-to-maintanace', async (req, res) => {
-    const { issue } = req.body;
+// app.post('/assign-to-maintanace', async (req, res) => {
+//     const { issue,selectedMaintananceID } = req.body;
     
+
+//     try {
+//         const pool = await createConnectionPool();
+//         const connection = await pool.getConnection();
+
+//         //add a column called MaintananceAssigned which will store the ID of the mainatanance assigned
+//         const sql = 'INSERT INTO MaintenanceIssues (issueAssigned, selectedMaintananceID ) VALUES (? ,?) ';
+//         await connection.execute(sql, [issue, selectedMaintananceID]);
+
+//         connection.release();
+
+//         console.log('Issue submitted successfully');
+//         res.status(201).json({ message: 'Issue assigned successfully' });
+//     } catch (error) {
+//         console.error('Error assigning issue:', error);
+//         res.status(500).json({ error: 'Internal server error' });
+//     }
+// });
+
+app.post('/assign-to-maintanace', async (req, res) => {
+    const { issue, selectedMaintenanceID } = req.body;
 
     try {
         const pool = await createConnectionPool();
         const connection = await pool.getConnection();
 
-        const sql = 'INSERT INTO MaintenanceIssues (issueAssigned) VALUES (?) ';
-        await connection.execute(sql, [issue]);
+        // Insert a new issue with the selectedMaintenanceID
+        const sql = `
+            INSERT INTO MaintenanceIssues (issueAssigned, selectedMaintananceID)
+            VALUES (?, ?)
+        `;
+        await connection.execute(sql, [issue, selectedMaintenanceID]);
 
         connection.release();
 
-        console.log('Issue submitted successfully');
+        console.log('Issue inserted successfully');
         res.status(201).json({ message: 'Issue assigned successfully' });
     } catch (error) {
         console.error('Error assigning issue:', error);
@@ -435,22 +453,28 @@ app.post('/update-feedback/:id', async (req, res) => {
 // get total issues for maintanace guy Denzel
 app.get('/total-issues', async (req, res) => {
     try {
+
+        //retrieve maintanance id from the session
+        const selectedMaintananceID=req.session.selectedMaintananceID
+
         const pool = await createConnectionPool();
         const connection = await pool.getConnection();
   
         // Retrieve all reported issues from the database
-        const [rows] = await connection.execute('SELECT id,issueAssigned FROM MaintenanceIssues where feedback is null');
+        const [rows] = await connection.execute('SELECT id,issueAssigned FROM MaintenanceIssues where feedback is null and selectedMaintananceID=?', [selectedMaintananceID]);
         
         // Extract ids and issues from the rows
         const ids = rows.map(row => row.id);
         const issues = rows.map(row => row.issueAssigned); // Use 'issueAssigned' instead of 'issue'
-        
+        const selectedMaintananceIDs=rows.map(row => row.selectedMaintananceID);
         connection.release();
         
         console.log("Rows", rows);
+
+        
         
         // Send the list of reported issues to the client
-        res.status(200).json({issues,ids });
+        res.status(200).json({issues,ids,selectedMaintananceIDs });
     } catch (error) {
         console.error('Error fetching reported issues:', error);
         res.status(500).json({ error: 'Internal server error' });
@@ -703,6 +727,30 @@ app.get('/recipients', async (req, res) => {
     } catch (error) {
         console.error('Error fetching recipients from database:', error);
         res.status(500).json({ error: 'Internal server error' });
+    }
+});
+
+//get all maintanance people so that they be populated on the dropdow when an issue is assigned
+app.get('/get-maintanance', async (req, res) => {
+    try {
+        const pool = await createConnectionPool();
+        const connection = await pool.getConnection();
+
+        const [rows] = await connection.execute('SELECT id, name FROM Staff_maintanance');
+
+        const maintananceFetched = rows.map(row => ({
+            id: row.id,
+            name: row.name
+        }));
+
+        
+
+        connection.release();
+
+        res.status(200).json(maintananceFetched);
+    } catch (error) {
+        console.log('Error fetching maintenance from database:', error);
+        res.status(500).json({ error: 'Internal Server Error' });
     }
 });
 
