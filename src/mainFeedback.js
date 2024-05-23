@@ -62,18 +62,17 @@ function openFeedbackModal(issueId) {
 
     // Get the textarea, dropdown menu, and save button from the modal
     const feedbackTextArea = document.getElementById('feedbackTextArea');
-    const feedbackMonthDropdown = document.getElementById('feedbackMonth');
+    //const feedbackMonthDropdown = document.getElementById('feedbackMonth');
     const saveFeedbackButton = document.getElementById('saveFeedbackButton');
 
     // Set up event listener for the save button
     saveFeedbackButton.onclick = function() {
         const feedback = feedbackTextArea.value; // Get the feedback text
-        const month = feedbackMonthDropdown.value; // Get the selected month
+        
         console.log('Feedback:', feedback);
-        console.log('Month:', month);
-
+       
         // Call a function to save the feedback to the database
-        saveFeedback(issueId, feedback, month);
+        saveFeedback(issueId, feedback);
 
         // Hide the modal after saving feedback
         modal.style.display = 'none';
@@ -87,14 +86,14 @@ function openFeedbackModal(issueId) {
     };
 }
 
-async function saveFeedback(issueId, feedback, month) {
+async function saveFeedback(issueId, feedback) {
     try {
         const response = await fetch(`/update-feedback/${issueId}`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json'
             },
-            body: JSON.stringify({ feedback: feedback, month: month }) // Include month in the request body
+            body: JSON.stringify({ feedback: feedback})  
         });
 
         if (!response.ok) {

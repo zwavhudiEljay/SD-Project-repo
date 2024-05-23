@@ -1,6 +1,5 @@
 const http = require('http');
 const express = require('express');
-const socketIo = require('socket.io');
 const cors = require("cors");
 const bcrypt = require('bcryptjs');
 const mysql = require('mysql2/promise');
@@ -12,15 +11,14 @@ const fs=require("fs");
 
 const app = express();
 const server = http.createServer(app); // Create HTTP server using Express app
-const io = socketIo(server); // Attach Socket.IO to the HTTP server
+
 const port = process.env.PORT || 3000;
 
-//app.use('/uploads', express.static(path.join(__dirname,'src','uploads')))
 app.use(cors());
 app.use(express.static('src'));
 app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
-//app.use(bodyParser.json());
+
 
 // Set up session store with MySQL
 
@@ -35,22 +33,6 @@ app.use(session({
 
 const upload = multer({ dest: 'uploads/' });
 
-// Socket.IO connection handling
-io.on('connection', socket => {
-    console.log('A user connected');
-
-    // Handle new issue reported by tenant
-    socket.on('reportIssue', issue => {
-        console.log('New issue reported:', issue);
-        // Emit the issue to all staff members
-        io.emit('newIssue', issue);
-    });
-
-    // Handle disconnections
-    socket.on('disconnect', () => {
-        console.log('User disconnected');
-    });
-});
 
 
 
@@ -285,18 +267,19 @@ app.get('/reported-issues', async (req, res) => {
       const connection = await pool.getConnection();
 
       // Retrieve all reported issues from the database
-      const [rows] = await connection.execute('SELECT id,issue FROM issue_reports');
+      const [rows] = await connection.execute('SELECT id,issue,month FROM issue_reports');
 
       const ids = rows.map(row => row.id);
       const issues = rows.map(row => row.issue);
+      const months= rows.map(row => row.month)
 
       connection.release();
 
       
    
 
-      // Send the list of reported issues to the client
-      res.status(200).json({issues,ids });
+      // Send the list of reported issues to the client including the month
+      res.status(200).json({issues,ids,months });
       
   } catch (error) {
       console.error('Error fetching reported issues:', error);
@@ -378,30 +361,11 @@ const getTotalIssuesCount = async () => {
       throw error;
   }
 };
-// app.post('/assign-to-maintanace', async (req, res) => {
-//     const { issue,selectedMaintananceID } = req.body;
-    
 
-//     try {
-//         const pool = await createConnectionPool();
-//         const connection = await pool.getConnection();
-
-//         //add a column called MaintananceAssigned which will store the ID of the mainatanance assigned
-//         const sql = 'INSERT INTO MaintenanceIssues (issueAssigned, selectedMaintananceID ) VALUES (? ,?) ';
-//         await connection.execute(sql, [issue, selectedMaintananceID]);
-
-//         connection.release();
-
-//         console.log('Issue submitted successfully');
-//         res.status(201).json({ message: 'Issue assigned successfully' });
-//     } catch (error) {
-//         console.error('Error assigning issue:', error);
-//         res.status(500).json({ error: 'Internal server error' });
-//     }
-// });
-
+//assign maintanance
 app.post('/assign-to-maintanace', async (req, res) => {
-    const { issue, selectedMaintenanceID } = req.body;
+    console.log('request body is: ',req.body);
+    const { issue,month, selectedMaintenanceID } = req.body;
 
     try {
         const pool = await createConnectionPool();
@@ -409,10 +373,10 @@ app.post('/assign-to-maintanace', async (req, res) => {
 
         // Insert a new issue with the selectedMaintenanceID
         const sql = `
-            INSERT INTO MaintenanceIssues (issueAssigned, selectedMaintananceID)
-            VALUES (?, ?)
+            INSERT INTO MaintenanceIssues (issueAssigned, month, selectedMaintananceID)
+            VALUES (?, ?, ?)
         `;
-        await connection.execute(sql, [issue, selectedMaintenanceID]);
+        await connection.execute(sql, [issue,month, selectedMaintenanceID]);
 
         connection.release();
 
@@ -431,15 +395,15 @@ app.post('/assign-to-maintanace', async (req, res) => {
 // add feedback to the issues that might be complete Denzel
 
 app.post('/update-feedback/:id', async (req, res) => {
-    const { feedback, month } = req.body; // Destructure feedback and month from the request body
+    const { feedback } = req.body; // Destructure feedback and month from the request body
     const issueId = req.params.id;
 
     try {
         const pool = await createConnectionPool();
         const connection = await pool.getConnection();
 
-        const sql = 'UPDATE MaintenanceIssues SET feedback = ?, month = ? WHERE id = ?'; // Update SQL query to include month
-        await connection.execute(sql, [feedback, month, issueId]); // Pass feedback, month, and issueId as parameters
+        const sql = 'UPDATE MaintenanceIssues SET feedback = ? WHERE id = ?'; // Update SQL query to include month
+        await connection.execute(sql, [feedback, issueId]); // Pass feedback, month, and issueId as parameters
 
         connection.release();
         console.log('Feedback given successfully');
@@ -538,15 +502,6 @@ app.delete('/delete-user/:id', async (req, res) => {
     }
   });
   
-
-// Socket.IO Server-Side Code
-io.on('connection', async (socket) => {
-  
-  // Send total count of reported issues to the client
-  const totalCount = await getTotalIssuesCount();
-  socket.emit('total-issues-count', totalCount);
-});
-
 
 //administrator adds staff members
 app.post('/add-staff', async (request, response) => {
@@ -1025,11 +980,18 @@ app.get('/fines-data', async (req, res) => {
 });
 
 //denzel
+
 function generateFullMonthSet2() {
     const months = [
-        "January", "February", "March", "April", "May", "June"
+        { number: "01", name: "January" },
+        { number: "02", name: "February" },
+        { number: "03", name: "March" },
+        { number: "04", name: "April" },
+        { number: "05", name: "May" },
+        { number: "06", name: "June" }
+        // Add the remaining months as needed
     ];
-    return months.map(month => ({ month, num_issues: 0, num_open_issues: 0, num_closed_issues: 0 }));
+    return months.map(month => ({ ...month, num_of_assigned_issues: 0, num_open_tickets: 0, num_closed_tickets: 0 }));
 }
 
 app.get('/issues-table-data', async (req, res) => {
@@ -1037,51 +999,29 @@ app.get('/issues-table-data', async (req, res) => {
         const pool = await createConnectionPool();
         const connection = await pool.getConnection();
 
-        // Fetch monthly issue counts
-        const [issueRows] = await connection.execute(`
+        const [rows] = await connection.execute(`
             SELECT 
-                month, 
-                COUNT(issue) AS num_issues
-            FROM 
-                issue_reports
-            GROUP BY 
-                month;
+                LPAD(month, 2, '0') AS month, 
+                COUNT(*) AS num_of_assigned_issues,
+                SUM(CASE WHEN feedback IS NULL THEN 1 ELSE 0 END) AS num_open_tickets,
+                SUM(CASE WHEN feedback IS NOT NULL THEN 1 ELSE 0 END) AS num_closed_tickets
+            FROM MaintenanceIssues 
+            GROUP BY month
         `);
-
-        // Fetch closed issue counts
-        const [closedIssueRows] = await connection.execute(`
-            SELECT 
-                month,
-                COUNT(*) AS num_closed_issues
-            FROM 
-                maintenanceissues
-            WHERE 
-                feedback IS NOT NULL
-            GROUP BY 
-                month;
-        `);
-
         connection.release();
 
-        // Combine the results into a single array
         const fullMonthSet = generateFullMonthSet2();
 
-        issueRows.forEach(({ month, num_issues }) => {
-            if (month && month >= 1 && month <= 6) {
-                const index = month - 1; // Adjusting for 0-based index
-                fullMonthSet[index].num_issues = num_issues;
+        rows.forEach(({ month, num_of_assigned_issues, num_open_tickets, num_closed_tickets }) => {
+            const index = fullMonthSet.findIndex(item => item.number === month);
+            if (index !== -1) {
+                fullMonthSet[index].num_of_assigned_issues = num_of_assigned_issues;
+                fullMonthSet[index].num_open_tickets = num_open_tickets;
+                fullMonthSet[index].num_closed_tickets = num_closed_tickets;
             }
         });
 
-        closedIssueRows.forEach(({ month, num_closed_issues }) => {
-            if (month && month >= 1 && month <= 6) {
-                const index = month - 1; // Adjusting for 0-based index
-                const num_issues = fullMonthSet[index].num_issues;
-                const num_open_issues = num_issues - num_closed_issues;
-                fullMonthSet[index].num_open_issues = num_open_issues;
-                fullMonthSet[index].num_closed_issues = num_closed_issues;
-            }
-        });
+        fullMonthSet.sort((a, b) => a.number - b.number);
 
         res.json(fullMonthSet);
     } catch (error) {
@@ -1089,6 +1029,11 @@ app.get('/issues-table-data', async (req, res) => {
         res.status(500).json({ error: 'Internal server error' });
     }
 });
+
+
+
+
+
 server.listen(port, () => {
     console.log(`Server started at http://localhost:${port}`);
 });

@@ -10,10 +10,11 @@ function fetchReportedIssues() {
             }
         })
         .then(data => {
-            const { issues, ids } = data;
+            console.log("fetched data is: ",data);
+            const { issues, ids, months } = data;
             fetchMaintenancePeople()
                 .then(maintenancePeople => {
-                    updateNotificationsWidget(issues, ids, maintenancePeople);
+                    updateNotificationsWidget(issues, ids,months, maintenancePeople);
                 })
                 .catch(error => {
                     console.error('Error fetching maintenance people:', error);
@@ -33,13 +34,14 @@ function fetchMaintenancePeople() {
         });
 }
 
-function updateNotificationsWidget(issues, ids, maintenancePeople) {
+function updateNotificationsWidget(issues, ids,months, maintenancePeople) {
     const notificationsTableBody = document.querySelector('#notifications-table tbody');
     notificationsTableBody.innerHTML = ''; // Clear existing rows
 
     issues.forEach((issue, index) => {
         const newRow = document.createElement('tr');
         newRow.dataset.issueId = ids[index]; // Add data attribute for issue ID
+        newRow.dataset.method=months[index]//set the month of each issue
 
         // Description column
         const descriptionCell = document.createElement('td');
@@ -78,7 +80,7 @@ function updateNotificationsWidget(issues, ids, maintenancePeople) {
         assignButton.onclick = function() {
             const selectedMaintenanceID = dropdown.value;
             if (selectedMaintenanceID) {
-                assignMaintenance(issue, assignButton, ids[index], selectedMaintenanceID);
+                assignMaintenance(issue, assignButton, ids[index],months[index], selectedMaintenanceID);
             } else {
                 alert('Please select a maintenance person');
             }
@@ -120,7 +122,7 @@ function updateAssignedStateInStorage(issueId, assigned) {
     localStorage.setItem(`issue-${issueId}`, assigned);
 }
 
-function assignMaintenance(issue, assignButton, issueId, selectedMaintenanceID) {
+function assignMaintenance(issue, assignButton, issueId,month, selectedMaintenanceID) {
     if (assignButton.disabled) {
         return;
     }
@@ -129,7 +131,7 @@ function assignMaintenance(issue, assignButton, issueId, selectedMaintenanceID) 
         headers: {
             'Content-Type': 'application/json'
         },
-        body: JSON.stringify({ issue, issueId, selectedMaintenanceID })
+        body: JSON.stringify({ issue, issueId,month, selectedMaintenanceID })
     })
     .then(response => {
         if (response.ok) {

@@ -248,152 +248,146 @@
 
 
         //denzel
+
         async function fetchIssuesData() {
-            const response = await fetch('/issues-table-data');
-            if (!response.ok) {
-                throw new Error('Failed to fetch issues data');
+        const response = await fetch('/issues-table-data');
+        if (!response.ok) {
+            throw new Error('Failed to fetch issues data');
+        }
+        return response.json();
+    }
+
+    function drawIssuesChart(data) {
+        const ctx = document.getElementById('IssuesCanvas').getContext('2d');
+        new Chart(ctx, {
+            type: 'bar',
+            data: {
+                labels: data.map(item => item.name),
+                datasets: [{
+                    label: 'Total Issues Assigned',
+                    data: data.map(item => item.num_of_assigned_issues),
+                    backgroundColor: 'rgba(255, 206, 86, 0.5)',
+                    borderColor: 'rgba(255, 206, 86, 1)',
+                    borderWidth: 1
+                }, {
+                    label: 'Closed Tickets',
+                    data: data.map(item => item.num_closed_tickets),
+                    backgroundColor: 'rgba(54, 162, 235, 0.5)',
+                    borderColor: 'rgba(54, 162, 235, 1)',
+                    borderWidth: 1
+                }, {
+                    label: 'Open Tickets',
+                    data: data.map(item => item.num_open_tickets),
+                    backgroundColor: 'rgba(255, 99, 132, 0.5)',
+                    borderColor: 'rgba(255, 99, 132, 1)',
+                    borderWidth: 1
+                }]
+            },
+            options: {
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        title: {
+                            display: true,
+                            text: "Number of Issues"
+                        }
+                    },
+                    x: {
+                        title: {
+                            display: true,
+                            text: "Months"
+                        }
+                    }
+                }
             }
-            return response.json();
-        }
+        });
+    }
 
-        function drawIssuesChart(data) {
-            const ctx = document.getElementById('IssuesCanvas').getContext('2d');
-            new Chart(ctx, {
-                type: 'bar',
-                data: {
-                    labels: data.map(item => item.month),
-                    datasets: [{
-                        label: 'Total Issues',
-                        data: data.map(item => item.num_issues),
-                        backgroundColor: 'rgba(255, 206, 86, 0.5)',
-                        borderColor: 'rgba(255, 206, 86, 1)',
-                        borderWidth: 1
-                    }, {
-                        label: 'Issues still open',
-                        data: data.map(item => item.num_open_issues),
-                        backgroundColor: 'rgba(54, 162, 235, 0.5)',
-                        borderColor: 'rgba(54, 162, 235, 1)',
-                        borderWidth: 1
-                    }, {
-                        label: 'Closed Issues',
-                        data: data.map(item => item.num_closed_issues),
-                        backgroundColor: 'rgba(255, 99, 132, 0.5)',
-                        borderColor: 'rgba(255, 99, 132, 1)',
-                        borderWidth: 1
-                    }]
-                },
-                options: {
-                    scales: {
-                        y: {
-
-                            beginAtZero: true,
-                            title:{
-                                display:true,
-                                text:"Number of Fine"
-                            }
-                        },
-                        x: {
-
-                            beginAtZero: true,
-                            title:{
-                                display:true,
-                                text:"Months"
-                            }
+    function drawIssuesLineChart(data) {
+        const ctx = document.getElementById('IssueslineChartCanvas').getContext('2d');
+        new Chart(ctx, {
+            type: 'line',
+            data: {
+                labels: data.map(item => item.name),
+                datasets: [{
+                    label: 'Total Issues Assigned',
+                    data: data.map(item => item.num_of_assigned_issues),
+                    backgroundColor: 'rgba(255, 206, 86, 0.5)',
+                    borderColor: 'rgba(255, 206, 86, 1)',
+                    fill: false,
+                    tension: 0.1
+                }, {
+                    label: 'Open Tickets',
+                    data: data.map(item => item.num_closed_tickets),
+                    backgroundColor: 'rgba(54, 162, 235, 0.5)',
+                    borderColor: 'rgba(54, 162, 235, 1)',
+                    fill: false,
+                    tension: 0.1
+                }, {
+                    label: 'Closed Tickets',
+                    data: data.map(item => item.num_open_tickets),
+                    backgroundColor: 'rgba(255, 99, 132, 0.5)',
+                    borderColor: 'rgba(255, 99, 132, 1)',
+                    fill: false,
+                    tension: 0.1
+                }]
+            },
+            options: {
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        title: {
+                            display: true,
+                            text: "Number of Issues"
+                        }
+                    },
+                    x: {
+                        title: {
+                            display: true,
+                            text: "Months"
                         }
                     }
                 }
-            });
-        }
+            }
+        });
+    }
 
-        function drawIssuesLineChart(data) {
-            const ctx = document.getElementById('IssueslineChartCanvas').getContext('2d');
-            new Chart(ctx, {
-                type: 'line',
-                data: {
-                    labels: data.map(item => item.month),
-                    datasets: [{
-                        label: 'Total Fines',
-                        data: data.map(item => item.num_issues),
-                        backgroundColor: 'rgba(255, 206, 86, 0.5)',
-                        borderColor: 'rgba(255, 206, 86, 1)',
-                        fill: false,
-                        tension: 0.1
-                    }, {
-                        label: 'Issues Still open',
-                        data: data.map(item => item.num_open_issues),
-                        backgroundColor: 'rgba(54, 162, 235, 0.5)',
-                        borderColor: 'rgba(54, 162, 235, 1)',
-                        fill: false,
-                        tension: 0.1
-                    }, {
-                        label: 'Closed Issues',
-                        data: data.map(item => item.num_closed_issues),
-                        backgroundColor: 'rgba(255, 99, 132, 0.5)',
-                        borderColor: 'rgba(255, 99, 132, 1)',
-                        fill: false,
-                        tension: 0.1
-                    }]
-                },
-                options: {
-                    scales: {
-                        y: {
+    function drawIssuesPieChart(data) {
+        const ctx = document.getElementById('IssuespieChartCanvas').getContext('2d');
+        new Chart(ctx, {
+            type: 'pie',
+            data: {
+                labels: data.map(item => item.name),
+                datasets: [{
+                    label: 'Total Issues Assigned',
+                    data: data.map(item => item.num_of_assigned_issues),
+                    backgroundColor: [
+                        'blue',
+                        '#e04141',
+                        'pink',
+                        'green',
+                        'yellow',
+                        'orange'
+                    ],
+                    borderWidth: 1
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false
+            }
+        });
+    }
 
-                            beginAtZero: true,
-                            title:{
-                                display:true,
-                                text:"Number of Fine"
-                            }
-                        },
-                        x: {
-
-                            beginAtZero: true,
-                            title:{
-                                display:true,
-                                text:"Months"
-                            }
-                        }
-                    }
-                }
-            });
-        }
-
-        function drawIssuesPieChart(data) {
-            const ctx = document.getElementById('IssuespieChartCanvas').getContext('2d');
-            new Chart(ctx, {
-                type: 'pie',
-                data: {
-                    labels: data.map(item => item.month),
-                    datasets: [{
-                        label: 'Total Issues',
-                        data: data.map(item => item.num_issues),
-                        backgroundColor: [
-                            'blue',
-                            '#e04141',
-                            'pink',
-                            'green',
-                            'yellow',
-                            'orange'
-                            
-                        ],
-                        borderWidth: 1
-                    }]
-                },
-                options: {
-                    responsive: true,
-                    maintainAspectRatio: false
-                }
-            });
-        }
-
-        fetchIssuesData()
-            .then(data => {
-                drawIssuesChart(data);
-                drawIssuesLineChart(data);
-                drawIssuesPieChart(data);
-            })
-            .catch(error => {
-                console.error('Error fetching issues data:', error);
-            });
+    fetchIssuesData()
+        .then(data => {
+            drawIssuesChart(data);
+            drawIssuesLineChart(data);
+            drawIssuesPieChart(data);
+        })
+        .catch(error => {
+            console.error('Error fetching issues data:', error);
+        });
 
         function downloadPdf() {
             const element = document.body; // Select the entire body content
