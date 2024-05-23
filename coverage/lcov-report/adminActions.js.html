@@ -23,30 +23,30 @@
         <div class='clearfix'>
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">67.1% </span>
+                <span class="strong">82.02% </span>
                 <span class="quiet">Statements</span>
-                <span class='fraction'>51/76</span>
+                <span class='fraction'>73/89</span>
             </div>
         
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">43.75% </span>
+                <span class="strong">76.47% </span>
                 <span class="quiet">Branches</span>
-                <span class='fraction'>14/32</span>
-            </div>
-        
-            
-            <div class='fl pad1y space-right2'>
-                <span class="strong">57.14% </span>
-                <span class="quiet">Functions</span>
-                <span class='fraction'>4/7</span>
+                <span class='fraction'>26/34</span>
             </div>
         
             
             <div class='fl pad1y space-right2'>
                 <span class="strong">66.66% </span>
+                <span class="quiet">Functions</span>
+                <span class='fraction'>6/9</span>
+            </div>
+        
+            
+            <div class='fl pad1y space-right2'>
+                <span class="strong">81.81% </span>
                 <span class="quiet">Lines</span>
-                <span class='fraction'>50/75</span>
+                <span class='fraction'>72/88</span>
             </div>
         
             
@@ -359,16 +359,7 @@
 <span class="cline-any cline-yes">4x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">2x</span>
-<span class="cline-any cline-yes">2x</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">2x</span>
-<span class="cline-any cline-yes">2x</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">2x</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-yes">4x</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
@@ -444,6 +435,20 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">9x</span>
+<span class="cline-any cline-yes">9x</span>
+<span class="cline-any cline-yes">8x</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">5x</span>
+<span class="cline-any cline-yes">5x</span>
+<span class="cline-any cline-yes">5x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">3x</span>
+<span class="cline-any cline-yes">6x</span>
+<span class="cline-any cline-yes">6x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">6x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -451,24 +456,10 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">6x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">6x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -646,35 +637,35 @@ document.addEventListener('DOMContentLoaded', <span class="fstat-no" title="func
 <span class="cstat-no" title="statement not covered" >    displayStaffList(); </span>// Call the function to display the staff list when the page loads
 });
 &nbsp;
-// async function displayStaffList() {
-//     try {
-//         const response = await fetch('/all-staff');
-//         if (!response.ok) {
-//             throw new Error('Network response was not ok');
-//         }
-//         const staffMembers = await response.json();
-//         const searchResults = document.getElementById('searchResults');
-//         searchResults.innerHTML = ''; // Clear previous search results
+async function displayStaffList() {
+    try {
+        const response = await fetch('/all-staff');
+        if (!response.ok) {
+            throw new Error('Network response was not ok');
+        }
+        const staffMembers = await response.json();
+        const searchResults = document.getElementById('searchResults');
+        searchResults.innerHTML = ''; // Clear previous search results
 &nbsp;
-//         staffMembers.forEach(staff =&gt; {
-//             const listItem = document.createElement('li');
-//             listItem.classList.add('search-result');
-//             // Display staff information except for the password
-//             listItem.innerHTML = `
-//             &lt;article class="staff-info"&gt;
-//                 &lt;h2&gt;${staff.name}&lt;/h2&gt;
-//                 &lt;h3&gt;Email: ${staff.email}&lt;/h3&gt;
-//                 &lt;h3&gt;Id: ${staff.id}&lt;/h3&gt;
-//                 &lt;button class="delete-button" onclick="deleteStaff(${staff.id}, 'staff-${staff.id}')"&gt;Delete&lt;/button&gt;
-//             &lt;/article&gt;
-//             `;
-//             searchResults.appendChild(listItem);
-//         });
-//     } catch (error) {
-//         console.error('Error displaying staff list:', error);
-//         // Optionally, show an error message to the user
-//     }
-// }
+        staffMembers.forEach(staff =&gt; {
+            const listItem = document.createElement('li');
+            listItem.classList.add('search-result');
+            // Display staff information except for the password
+            listItem.innerHTML = `
+            &lt;article class="staff-info"&gt;
+                &lt;h2&gt;${staff.name}&lt;/h2&gt;
+                &lt;h3&gt;Email: ${staff.email}&lt;/h3&gt;
+                &lt;h3&gt;Id: ${staff.id}&lt;/h3&gt;
+                &lt;button class="delete-button" onclick="deleteStaff(${staff.id}, 'staff-${staff.id}')"&gt;Delete&lt;/button&gt;
+            &lt;/article&gt;
+            `;
+            searchResults.appendChild(listItem);
+        });
+    } catch (error) {
+        console.error('Error displaying staff list:', error);
+        // Optionally, show an error message to the user
+    }
+}
 &nbsp;
 module.exports = {
     searchStaff: searchStaff,
@@ -688,7 +679,7 @@ module.exports = {
             <div class='footer quiet pad2 space-top1 center small'>
                 Code coverage generated by
                 <a href="https://istanbul.js.org/" target="_blank" rel="noopener noreferrer">istanbul</a>
-                at 2024-05-18T16:07:47.504Z
+                at 2024-05-23T11:15:12.821Z
             </div>
         <script src="prettify.js"></script>
         <script>

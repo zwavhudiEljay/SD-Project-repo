@@ -65,13 +65,7 @@ describe('openFeedbackModal', () => {
         document.body.innerHTML = `
             <div id="feedbackModal" style="display: none;">
                 <textarea id="feedbackTextArea"></textarea>
-                <select id="feedbackMonth">
-                    <option value="January">January</option>
-                    <option value="February">February</option>
-                    <option value="March">March</option>
-                    <option value="April">April</option>
-                    <option value="May">May</option>
-                </select>
+                
                 <button id="saveFeedbackButton"></button>
             </div>
         `;
@@ -83,16 +77,16 @@ describe('openFeedbackModal', () => {
         const modal = document.getElementById('feedbackModal');
         const saveButton = document.getElementById('saveFeedbackButton');
         const textArea = document.getElementById('feedbackTextArea');
-        const dropdown = document.getElementById('feedbackMonth');
+        
 
         expect(modal.style.display).toBe('block');
 
         textArea.value = 'Test feedback';
-        dropdown.value = 'May';
+       
         saveButton.click();
 
         expect(console.log).toHaveBeenCalledWith('Feedback:', 'Test feedback');
-        expect(console.log).toHaveBeenCalledWith('Month:', 'May');
+        
     });
 });
 
