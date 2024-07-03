@@ -20,7 +20,7 @@ app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
 
 
-// Set up session store with MySQL
+// Set up a session store with MySQL
 
 
 app.use(session({
